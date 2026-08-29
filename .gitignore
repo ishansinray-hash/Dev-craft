@@ -1,6 +1,9 @@
 node_modules/
 dist/
 coverage/
+relay.db
+relay.db-shm
+relay.db-wal
 .env
 .env.*
 !.env.example
