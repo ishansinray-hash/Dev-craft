@@ -1,0 +1,14 @@
+services:
+  relay:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DB_PATH: /data/relay.db
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-ShIsbgkxI5qhliuNQqt4CgxyYc6IhSqf}
+      MISTRAL_MODEL: ${MISTRAL_MODEL:-mistral-small-latest}
+    volumes:
+      - relay-data:/data
+
+volumes:
+  relay-data:

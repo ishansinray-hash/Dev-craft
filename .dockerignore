@@ -1,0 +1,9 @@
+.git
+node_modules
+.env
+relay.db
+relay.db-shm
+relay.db-wal
+coverage
+dist
+
