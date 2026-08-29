@@ -1,7 +1,7 @@
 // Batch entry point. This is the interface judges drive in Test A.
 //   npx tsx src/cli.ts --in messages_test_inputs.json --out results.json
 import { readFileSync, writeFileSync } from "node:fs";
-import { parse, InputRecord } from "./parse.js";
+import { parse, type InputRecord } from "./core/parsar/parse.js";
 
 const args = process.argv.slice(2);
 const arg = (n: string) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : undefined; };

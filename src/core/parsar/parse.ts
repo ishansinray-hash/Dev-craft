@@ -110,7 +110,7 @@ export function parse(rec: InputRecord): OrderRecord {
     .test(normalize(rec.message));                                          // (b)
   const blockingKey = BLOCKING[rec.domain];                                 // (d)
   const blocked = !!blockingKey && items.length > 0 &&
-    items.every((i) => !(blockingKey in i.attributes));
+    items.every((i: Item) => !(blockingKey in i.attributes));
 
   const needs = noItem || ambiguousQty || unresolvable || blocked;
 
@@ -119,7 +119,7 @@ export function parse(rec: InputRecord): OrderRecord {
   let conf = 1;
   if (needs) conf -= 0.4;
   if (noItem) conf -= 0.3;
-  if (items.some((i) => Object.keys(i.attributes).length === 0)) conf -= 0.1;
+  if (items.some((i: Item) => Object.keys(i.attributes).length === 0)) conf -= 0.1;
 
   return {
     customer: extractCustomer(rec.message),
