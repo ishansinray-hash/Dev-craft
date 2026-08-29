@@ -1,0 +1,26 @@
+[
+  {
+    "id": "test-001",
+    "domain": "tailor",
+    "received_at": "2026-08-30T10:00:00Z",
+    "message": "Didi mujhe 3 kurti chahiye and 2 jeans black pant chahiye."
+  },
+  {
+    "id": "test-002",
+    "domain": "tailor",
+    "received_at": "2026-08-30T10:00:00Z",
+    "message": "Bhaiya 5 kurta white color aur 3 salwar blue chahiye"
+  },
+  {
+    "id": "test-003",
+    "domain": "baker",
+    "received_at": "2026-08-30T10:00:00Z",
+    "message": "Uncle do chocolate cake aur 1 kg bread chahiye"
+  },
+  {
+    "id": "test-004",
+    "domain": "electrician",
+    "received_at": "2026-08-30T10:00:00Z",
+    "message": "Aunty mujhe 2 havells socket aur 10 meter wire black colour chahiye"
+  }
+]

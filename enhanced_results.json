@@ -1,0 +1,98 @@
+[
+ {
+  "id": "test-001",
+  "customer": null,
+  "items": [
+   {
+    "description": "kurti",
+    "quantity": 3,
+    "attributes": {}
+   },
+   {
+    "description": "pant",
+    "quantity": 2,
+    "attributes": {
+     "color": "black"
+    }
+   }
+  ],
+  "due_date": null,
+  "amount": null,
+  "references_prior_order": false,
+  "confidence": 0.9,
+  "needs_clarification": false
+ },
+ {
+  "id": "test-002",
+  "customer": null,
+  "items": [
+   {
+    "description": "kurta",
+    "quantity": 5,
+    "attributes": {
+     "color": "white"
+    }
+   },
+   {
+    "description": "salwar",
+    "quantity": 3,
+    "attributes": {
+     "color": "blue"
+    }
+   }
+  ],
+  "due_date": null,
+  "amount": null,
+  "references_prior_order": false,
+  "confidence": 1,
+  "needs_clarification": false
+ },
+ {
+  "id": "test-003",
+  "customer": null,
+  "items": [
+   {
+    "description": "cake",
+    "quantity": 2,
+    "attributes": {
+     "flavour": "chocolate"
+    }
+   },
+   {
+    "description": "bread",
+    "quantity": 1,
+    "attributes": {}
+   }
+  ],
+  "due_date": null,
+  "amount": null,
+  "references_prior_order": false,
+  "confidence": 0.9,
+  "needs_clarification": false
+ },
+ {
+  "id": "test-004",
+  "customer": null,
+  "items": [
+   {
+    "description": "socket",
+    "quantity": 2,
+    "attributes": {
+     "brand": "havells"
+    }
+   },
+   {
+    "description": "wire",
+    "quantity": 10,
+    "attributes": {
+     "color": "black"
+    }
+   }
+  ],
+  "due_date": null,
+  "amount": null,
+  "references_prior_order": false,
+  "confidence": 0.6,
+  "needs_clarification": true
+ }
+]

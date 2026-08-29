@@ -1,0 +1,25 @@
+[
+ {
+  "id": "test-001",
+  "customer": null,
+  "items": [
+   {
+    "description": "didi",
+    "quantity": 1,
+    "attributes": {}
+   },
+   {
+    "description": "pant",
+    "quantity": 2,
+    "attributes": {
+     "color": "black"
+    }
+   }
+  ],
+  "due_date": null,
+  "amount": null,
+  "references_prior_order": false,
+  "confidence": 0.9,
+  "needs_clarification": false
+ }
+]
