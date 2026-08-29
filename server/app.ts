@@ -46,15 +46,15 @@ export function buildApp(options: AppOptions = {}): FastifyInstance {
   const onlineInterpreter = options.onlineInterpreter ?? interpretWithMistral;
 
   const app = Fastify({ logger: false });
-  app.addHook("onSend", async (_request, reply) => {
+  app.addHook("onSend", async (_request: any, reply: any) => {
     reply.header("access-control-allow-origin", "*");
     reply.header("access-control-allow-headers", "content-type");
   });
   app.addHook("onClose", async () => { db.close(); });
-  app.options("/*", async (_request, reply) => reply.code(204).send());
+  app.options("/*", async (_request: any, reply: any) => reply.code(204).send());
   app.get("/health", async () => ({ ok: true, ops: count.get() }));
 
-  app.post<{ Body: SyncRequest }>("/sync", async (req, reply) => {
+  app.post<{ Body: SyncRequest }>("/sync", async (req: any, reply: any) => {
     const { cursor = 0, ops = [] } = req.body ?? {};
     if (!Number.isInteger(cursor) || cursor < 0 || !Array.isArray(ops))
       return reply.code(400).send({ error: "cursor must be a non-negative integer and ops an array" });
@@ -81,7 +81,7 @@ export function buildApp(options: AppOptions = {}): FastifyInstance {
     };
   });
 
-  app.post<{ Body: QueryRequest }>("/query/interpret", async (req, reply) => {
+  app.post<{ Body: QueryRequest }>("/query/interpret", async (req: any, reply: any) => {
     const { question, mode = "offline" } = req.body ?? {};
     if (typeof question !== "string" || !question.trim())
       return reply.code(400).send({ error: "question is required" });

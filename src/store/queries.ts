@@ -118,12 +118,12 @@ export type Ask =
 
 export function interpret(question: string): Ask {
   const q = question.toLowerCase().trim();
-  if (/(paisa|paise|udhaar|udhar|baki|bakaya|owe|owes|owing|due money|payment)/.test(q))
+  if (/\b(paisa|paise|udhaar|udhar|baki|bakaya|owe|owes|owing|due money|payment)\b/.test(q))
     return { kind: "outstanding" };
-  if (/(late|overdue|der|deri|nikal gaya|miss)/.test(q)) return { kind: "due", bucket: "overdue" };
-  if (/(aaj|today|aaj ka)/.test(q)) return { kind: "due", bucket: "today" };
-  if (/(hafte|week|capacity|load|kitna kaam)/.test(q)) return { kind: "capacity" };
-  if (/(conflict|clash|review|check karna)/.test(q)) return { kind: "review" };
+  if (/\b(late|overdue)\b|(?:^|\s)(der|miss)\w*(?:\s|$)/.test(q)) return { kind: "due", bucket: "overdue" };
+  if (/\b(aaj|today|aaj ka)\b/.test(q)) return { kind: "due", bucket: "today" };
+  if (/\b(hafte|week|capacity|load|kitna kaam)\b/.test(q)) return { kind: "capacity" };
+  if (/\b(conflict|clash|review|check karna)\b/.test(q)) return { kind: "review" };
   const m = q.match(/(?:ka|ke|of|for)\s+([a-z]{3,})\s*(?:order|history)?$/);
   if (m) return { kind: "customer", name: m[1] };
   return { kind: "unknown" };

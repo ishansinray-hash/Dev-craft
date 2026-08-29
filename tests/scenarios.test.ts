@@ -71,8 +71,8 @@ describe("scenario 2 - concurrent edit to the same field, identical timestamps",
     expect(r.aFirst).toEqual(r.bFirst);
   });
   it("picks the same winner both times - device id breaks the tie", () => {
-    const q = r.aFirst.record.items.find((i) => i.item_id === "it-1")!.quantity;
-    expect(q).toBe(r.bFirst.record.items.find((i) => i.item_id === "it-1")!.quantity);
+    const q = r.aFirst.record.items.find((i: any) => i.item_id === "it-1")!.quantity;
+    expect(q).toBe(r.bFirst.record.items.find((i: any) => i.item_id === "it-1")!.quantity);
     expect([3, 5]).toContain(q);
   });
   it("surfaces the losing edit instead of dropping it", () => {
@@ -100,11 +100,11 @@ describe("scenario 3 - delete versus update", () => {
     expect(r.aFirst).toEqual(r.bFirst);
   });
   it("keeps the item deleted", () => {
-    expect(r.aFirst.record.items.map((i) => i.item_id)).toEqual(["it-1"]);
+    expect(r.aFirst.record.items.map((i: any) => i.item_id)).toEqual(["it-1"]);
   });
   it("surfaces BOTH discarded edits against the tombstone", () => {
     expect(r.aFirst.conflicts[tomb]).toBeDefined();
-    const lost = r.aFirst.conflicts[tomb].losers.map((o) => o.value).sort();
+    const lost = r.aFirst.conflicts[tomb].losers.map((o: any) => o.value).sort();
     expect(lost).toEqual([4, "black"]);
   });
 });
