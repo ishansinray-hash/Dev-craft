@@ -11,3 +11,4 @@ const held = all.filter((_, i) => i % step === 0);
 writeFileSync("/tmp/holdout.json", JSON.stringify(held));
 execSync(`npx tsx src/cli.ts --in /tmp/holdout.json --out /tmp/holdout_pred.json`, { stdio: "inherit" });
 execSync(`python3 /mnt/user-data/uploads/score.py --gold /tmp/holdout.json --pred /tmp/holdout_pred.json`, { stdio: "inherit" });
+
