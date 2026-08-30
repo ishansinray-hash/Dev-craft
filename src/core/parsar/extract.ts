@@ -1,6 +1,6 @@
-import type { Domain } from "./vocab.js";
-import { COLOR_PATTERNS } from "./vocab.js";
+import { Domain } from "./vocab.js";
 import { normalize } from "./normalize.js";
+import { ITEM_SYNONYMS, COLOR_PATTERNS } from "./vocab.js";
 
 export interface Item {
   description: string;
@@ -8,201 +8,265 @@ export interface Item {
   attributes: Record<string, string | number | boolean>;
 }
 
-type ItemVocabulary = { description: string; aliases: string[] };
-type ItemMatch = { description: string; start: number; end: number; quantity: number; explicitQuantity: boolean };
-type Draft = Item & { firstPosition: number };
-
-const VOCABULARY: Record<Domain, ItemVocabulary[]> = {
-  tailor: [
-    { description: "waistcoat", aliases: ["waistcoat"] }, { description: "sherwani", aliases: ["sherwani"] },
-    { description: "lehenga", aliases: ["lehenga"] }, { description: "dupatta", aliases: ["dupatta"] },
-    { description: "blouse", aliases: ["blouse"] }, { description: "salwar", aliases: ["salwar"] },
-    { description: "pajama", aliases: ["pajama", "pyjama"] }, { description: "kameez", aliases: ["kameez"] },
-    { description: "kurta", aliases: ["kurta"] }, { description: "shirt", aliases: ["shirt"] },
-    { description: "pant", aliases: ["pant", "pants"] }, { description: "suit", aliases: ["suit"] },
-  ],
-  baker: [
-    { description: "birthday cake", aliases: ["birthday cake"] }, { description: "cheesecake", aliases: ["cheesecake"] },
-    { description: "bread loaf", aliases: ["bread loaf", "bread"] }, { description: "cupcake", aliases: ["cupcake"] },
-    { description: "cookies", aliases: ["cookies", "cookie", "biscuit"] }, { description: "brownie", aliases: ["brownie"] },
-    { description: "pastry", aliases: ["pastry"] }, { description: "donut", aliases: ["donut"] },
-    { description: "muffin", aliases: ["muffin"] }, { description: "cake", aliases: ["cake"] },
-  ],
-  electrician: [
-    { description: "switch board", aliases: ["switch board", "board"] }, { description: "water motor", aliases: ["water motor", "motor"] },
-    { description: "ceiling fan", aliases: ["ceiling fan"] }, { description: "exhaust fan", aliases: ["exhaust fan"] },
-    { description: "tube light", aliases: ["tube light"] }, { description: "ac point", aliases: ["ac point"] },
-    { description: "doorbell", aliases: ["doorbell"] }, { description: "inverter", aliases: ["inverter"] },
-    { description: "geyser", aliases: ["geyser"] }, { description: "wiring", aliases: ["wiring"] },
-    { description: "socket", aliases: ["socket"] }, { description: "mcb", aliases: ["mcb"] },
-  ],
-  tiffin: [
-    { description: "paneer sabzi", aliases: ["paneer sabzi", "paneer"] }, { description: "khichdi", aliases: ["khichdi"] },
-    { description: "paratha", aliases: ["paratha"] }, { description: "rajma", aliases: ["rajma"] },
-    { description: "sabzi", aliases: ["sabzi", "sabji"] }, { description: "chole", aliases: ["chole", "chhole"] },
-    { description: "curd", aliases: ["curd"] }, { description: "thali", aliases: ["thali"] },
-    { description: "idli", aliases: ["idli"] }, { description: "poha", aliases: ["poha"] },
-    { description: "rice", aliases: ["rice"] }, { description: "roti", aliases: ["roti"] },
-    { description: "dal", aliases: ["dal"] },
-  ],
+// Hindi numerals mapping with extended range
+const HINDI_NUMERALS: Record<string, number> = {
+  "ek": 1, "do": 2, "teen": 3, "char": 4, "paanch": 5,
+  "chhe": 6, "saat": 7, "aath": 8, "nau": 9, "das": 10,
+  "gyarah": 11, "barah": 12, "tera": 13, "chaudah": 14,
+  "pandrah": 15, "solah": 16, "satrah": 17, "athrah": 18,
+  "unnis": 19, "bees": 20, "tees": 30, "chalis": 40, "pachas": 50,
 };
 
-const BRAND_NAMES: Array<[string, string]> = [
-  ["havells", "Havells"], ["anchor", "Anchor"], ["polycab", "Polycab"], ["usha", "Usha"],
-  ["bajaj", "Bajaj"], ["crompton", "Crompton"], ["orient", "Orient"],
-];
+// Common item vocabularies by domain - expanded
+const DOMAIN_ITEMS: Record<Domain, string[]> = {
+  tailor: [
+    "kurti", "kurta", "shirt", "pant", "jeans", "suit", "dress", "skirt", "blouse",
+    "saree", "salwar", "kameez", "fabric", "cloth", "kapda", "pajama", "pyjama",
+    "trouser", "top", "dupatta", "dupata", "ghagra", "lehenga", "sherwani",
+    "safari suit", "jacket", "coat", "blazer", "churidar", "frock", "t-shirt", "tshirt",
+    "choli", "chunni", "odhani", "vest", "waistcoat", "bottom"
+  ],
+  baker: ["cake", "bread", "cookie", "cupcake", "pastry", "bun", "loaf", "donut", "brownie", "biscuit", "samosa"],
+  electrician: ["socket", "switch", "wire", "wiring", "fuse", "breaker", "light", "bulb", "fan", "meter", "cable", "conduit", "panel", "transformer"],
+  tiffin: ["meal", "lunch", "dinner", "breakfast", "tiffin", "khana", "food", "sabzi", "rice", "roti", "dal", "curry"],
+};
 
-function escapeRegExp(value: string): string { return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+// Common stop words to skip when extracting item names
+const STOP_WORDS = new Set([
+  "ke", "ka", "ki", "me", "mein", "tak", "se", "ko", "par", "pe", "le", "lo", "aur", "and",
+  "or", "ya", "h", "hai", "hain", "ho", "the", "tha", "thi", "chahiye", "chahte", "do",
+  "color", "colour", "colors", "colours", "rang", "shade", "chest", "waist", "length", "size",
+  "kamar", "lambai", "fit", "slim", "urgent", "urgently", "advance", "diya", "dena", "wali",
+  "wala", "wale", "liye", "bhi", "ekdam", "pure", "purely", "fabric", "material", "inch", "in"
+]);
 
-function quantityNear(text: string, start: number, end: number): { quantity: number; explicit: boolean } {
-  const previous = text.slice(Math.max(0, start - 28), start).match(/(?:^|[\s,;.])(\d+)(?:\s+ya\s+\d+)?\s*$/);
-  if (previous) return { quantity: Number(previous[1]), explicit: true };
-  const after = text.slice(end, end + 18);
-  const following = after.match(/^\s+(\d+)\b/);
-  if (following && !/^\s+\d+\s*(?:kg|watt|tier|din|roti|tarikh|tareekh|sep|oct|nov|aug|dec|jan|feb|mar|apr|may|jun|jul)\b/.test(after) && !/^\s+\d+\s*\/\s*\d+/.test(after)) {
-    return { quantity: Number(following[1]), explicit: true };
+// Honorifics and greetings that should not be treated as items
+const HONORIFICS = new Set([
+  "didi", "bhaiya", "bhai", "ji", "aunty", "uncle", "behen", "beta",
+  "sir", "madam", "saab", "sahib", "begum", "mummy", "daddy",
+]);
+
+// Extract quantity from text and return the value and the remaining text
+function extractQuantity(text: string): [number, string] {
+  // First try Hindi numerals at word boundary
+  const hindiMatch = text.match(/\b(ek|do|teen|char|paanch|chhe|saat|aath|nau|das|gyarah|barah|tees|chalis|pachas)\s+/i);
+  if (hindiMatch) {
+    const quantity = HINDI_NUMERALS[hindiMatch[1].toLowerCase()] || 1;
+    const remaining = text.replace(hindiMatch[0], "");
+    return [quantity, remaining];
   }
-  return { quantity: 1, explicit: false };
+  
+  // Try Arabic numerals (including at start or middle of text)
+  const numberMatch = text.match(/\b(\d+)\s+/);
+  if (numberMatch) {
+    const quantity = parseInt(numberMatch[1], 10);
+    const remaining = text.slice(0, numberMatch.index) + text.slice((numberMatch.index || 0) + numberMatch[0].length);
+    return [quantity, remaining.trim()];
+  }
+  
+  return [1, text];
 }
 
-function isNegated(text: string, end: number): boolean { return /^\s+(?:nahi|nahin)\b/.test(text.slice(end, end + 16)); }
-
-function isEmbeddedAppliance(text: string, start: number, description: string): boolean {
-  const before = text.slice(Math.max(0, start - 36), start);
-  const after = text.slice(start, start + 24);
-  if (description === "water motor") {
-    if (/\b(?:ceiling fan|inverter|geyser|socket|ac point)\s+(?:ka|ke|ki|wala|wali)\s*$/.test(before)) return true;
-    return /^motor\s+wal/.test(after);
-  }
-  if (!/^(?:geyser|inverter)\b/.test(text.slice(start))) return false;
-  return /^\s+wal/.test(text.slice(start + description.length)) && /\b(?:ceiling fan|exhaust fan|inverter|mcb|socket|wiring|ac point)\b/.test(before);
-}
-
-function findItems(text: string, domain: Domain): ItemMatch[] {
-  const found: Array<{ description: string; start: number; end: number }> = [];
-  for (const item of VOCABULARY[domain]) for (const alias of item.aliases) {
-    const expression = new RegExp(`(?:^|\\b)${escapeRegExp(alias)}(?=\\b|$)`, "g");
-    let match: RegExpExecArray | null;
-    while ((match = expression.exec(text))) {
-      const start = match.index + (match[0].length - match[0].trimStart().length);
-      const end = start + alias.length;
-      if (!isNegated(text, end) && !isEmbeddedAppliance(text, start, item.description)) found.push({ description: item.description, start, end });
+// Find best matching canonical item name from vocabulary
+function findCanonicalItemName(text: string, domain: Domain): string | null {
+  const normalized = text.toLowerCase();
+  const itemList = DOMAIN_ITEMS[domain] || [];
+  
+  // First check synonyms mapping (check longer matches first)
+  for (const [canonical, synonyms] of Object.entries(ITEM_SYNONYMS)) {
+    for (const synonym of synonyms) {
+      const re = new RegExp(`\\b${synonym}\\b`, "i");
+      if (re.test(normalized)) {
+        return canonical;
+      }
     }
   }
-  found.sort((a, b) => a.start - b.start || (b.end - b.start) - (a.end - a.start));
-  const selected: ItemMatch[] = [];
-  for (const item of found) {
-    if (selected.some((other) => item.start < other.end && other.start < item.end)) continue;
-    const detected = quantityNear(text, item.start, item.end);
-    selected.push({ ...item, quantity: Math.max(1, detected.quantity), explicitQuantity: detected.explicit });
+
+  // Then check canonical list
+  for (const item of itemList) {
+    const re = new RegExp(`\\b${item}\\b`, "i");
+    if (re.test(normalized)) {
+      return item;
+    }
   }
-  return selected.sort((a, b) => a.start - b.start);
+  
+  return null;
 }
 
-function setMeasurement(attributes: Item["attributes"], text: string, key: "chest" | "waist" | "length") {
-  const match = text.match(new RegExp(`\\b${key}\\s+(\\d+)\\b`));
-  if (match) attributes[key] = Number(match[1]);
+// Extract item description from text
+function extractItemDescription(text: string, domain: Domain): string | null {
+  const normalized = normalize(text).toLowerCase();
+  
+  // Try to find canonical item name first
+  const canonical = findCanonicalItemName(normalized, domain);
+  if (canonical) {
+    return canonical;
+  }
+  
+  // If no known item found, try to extract meaningful words
+  const words = normalized.split(/\s+/).filter(w => w.length > 0);
+  if (words.length > 0) {
+    // Return first meaningful word that isn't a stop word, honorific, number, or color keyword
+    for (const word of words) {
+      if (!STOP_WORDS.has(word) && !HONORIFICS.has(word) && !/^\d+$/.test(word) && !COLOR_PATTERNS[word]) {
+        return word;
+      }
+    }
+  }
+  
+  return null;
 }
 
-function attributesFor(text: string, domain: Domain): Item["attributes"] {
-  const attributes: Item["attributes"] = {};
-
-  // Shared palette first, so a colour the tailor list does not carry (orange,
-  // charcoal, firozi) still lands. The tailor block below runs afterwards and
-  // overwrites it, keeping the more precise reading — "navy blue" over "blue".
-  //
-  // Garments only. In a bakery order "red velvet" and "black forest" are
-  // flavours, and reading a colour out of them contradicts the labelled data;
-  // no domain but tailor carries a colour attribute.
-  if (domain === "tailor") for (const [name, value] of Object.entries(COLOR_PATTERNS)) {
-    if (new RegExp(`\\b${name}\\b`).test(text)) { attributes.color = value; break; }
+// Extract attributes from text with enhanced detection
+function extractAttributes(text: string, domain: Domain): Record<string, string | number | boolean> {
+  const attributes: Record<string, string | number | boolean> = {};
+  const normalized = normalize(text).toLowerCase();
+  
+  // Universal attribute extraction
+  // Look for colors (check longest keys first)
+  const sortedColors = Object.entries(COLOR_PATTERNS).sort((a, b) => b[0].length - a[0].length);
+  for (const [colorKey, colorValue] of sortedColors) {
+    const re = new RegExp(`\\b${colorKey}\\b`, "i");
+    if (re.test(normalized)) {
+      attributes["color"] = colorValue;
+      break;
+    }
   }
-
+  
+  // Domain-specific attribute extraction
   if (domain === "tailor") {
-    const colors: Array<[RegExp, string]> = [
-      [/\bbottle green\b/, "bottle green"], [/\bnavy blue\b/, "navy blue"], [/\bmaroon\b/, "maroon"],
-      [/\bmustard\b/, "mustard"], [/\bbeige\b/, "beige"], [/\bgrey|gray\b/, "grey"], [/\bpink\b/, "pink"],
-      [/\bwhite\b/, "white"], [/\bblack\b/, "black"], [/\bred\b/, "red"], [/\bblue\b/, "blue"], [/\bgreen\b/, "green"],
-    ];
-    const color = colors.find(([pattern]) => pattern.test(text));
-    if (color) attributes.color = color[1];
-    setMeasurement(attributes, text, "chest"); setMeasurement(attributes, text, "waist"); setMeasurement(attributes, text, "length");
-    const size = text.match(/\bsize\s*(xxl|xl|xs|s|m|l)\b|\b(xx?l|xs|s|m|l)\b/);
-    if (size) attributes.size = (size[1] ?? size[2]).toUpperCase();
-    if (/\b(slim|tight|fitted)\b/.test(text)) attributes.fit = "slim";
-    else if (/\b(loose|relaxed)\b/.test(text)) attributes.fit = "loose";
-    else if (/\b(regular|normal)\b/.test(text)) attributes.fit = "regular";
-    if (/\b(3\/4|three quarter)\s+sleeve\b/.test(text)) attributes.sleeve = "three-quarter";
-    else if (/\b(half|aadha)\s+sleeve\b/.test(text)) attributes.sleeve = "half";
-    else if (/\b(full|pura)\s+sleeve\b/.test(text)) attributes.sleeve = "full";
-    const fabric = text.match(/\b(linen|silk|rayon|chiffon|velvet|khadi)\b/);
-    if (fabric) attributes.fabric = fabric[1];
+    // Look for measurements: chest, waist, length, etc. (both "chest 42" and "42 chest")
+    const chestMatch = normalized.match(/\b(?:chest|size)\s*[:=-]?\s*(\d+)\b/i) ||
+                       normalized.match(/\b(\d+)\s*(?:inch|in)?\s*(?:ki\s+|ka\s+)?chest\b/i);
+    if (chestMatch) {
+      attributes["chest"] = parseInt(chestMatch[1], 10);
+    }
+    
+    const waistMatch = normalized.match(/\b(?:waist|kamar)\s*[:=-]?\s*(\d+)\b/i) ||
+                       normalized.match(/\b(\d+)\s*(?:inch|in)?\s*(?:ki\s+|ka\s+)?(?:waist|kamar)\b/i);
+    if (waistMatch) {
+      attributes["waist"] = parseInt(waistMatch[1], 10);
+    }
+    
+    const lengthMatch = normalized.match(/\b(?:length|lambai)\s*[:=-]?\s*(\d+)\b/i) ||
+                        normalized.match(/\b(\d+)\s*(?:inch|in)?\s*(?:ki\s+|ka\s+)?(?:length|lambai)\b/i);
+    if (lengthMatch) {
+      attributes["length"] = parseInt(lengthMatch[1], 10);
+    }
+    
+    // Look for fit types
+    if (/\b(slim|tight|snug|close|fitted)\b/.test(normalized)) attributes["fit"] = "slim";
+    if (/\b(loose|relaxed|comfort|baggy)\b/.test(normalized)) attributes["fit"] = "loose";
+    if (/\b(regular|normal|standard)\b/.test(normalized)) attributes["fit"] = "regular";
   }
+  
   if (domain === "baker") {
-    const flavour = text.match(/\b(red velvet|black forest|butterscotch|strawberry|chocolate|vanilla|pineapple|coffee|mango)\b/);
-    if (flavour) attributes.flavour = flavour[1];
-    const weight = text.match(/\b(\d+(?:\.\d+)?)\s*kg\b/); if (weight) attributes.weight_kg = Number(weight[1]);
-    const tier = text.match(/\b(\d+)\s*tier\b/); if (tier) attributes.tier = Number(tier[1]);
-    const shape = text.match(/\b(round|square|heart)\s*(?:shape)?\b/); if (shape) attributes.shape = shape[1];
-    if (/\beggless\b/.test(text)) attributes.egg_free = true;
-    else if (/\b(normal\s+)?ande?\s+wal(?:a|e|i|ey|iye)\b/.test(text)) attributes.egg_free = false;
+    // Look for flavors - expanded list
+    const flavors = [
+      "chocolate", "vanilla", "strawberry", "red velvet", "carrot", "lemon", "coffee", "mango",
+      "elaichi", "pista", "almond", "coconut", "butterscotch", "black forest"
+    ];
+    for (const flavor of flavors) {
+      if (normalized.includes(flavor)) {
+        attributes["flavour"] = flavor;
+        break;
+      }
+    }
+    
+    // Look for size
+    const sizeMatch = normalized.match(/\b(small|medium|large|xl|half\s*kg|1\s*kg|2\s*kg)\b/i);
+    if (sizeMatch) attributes["size"] = sizeMatch[1];
   }
+  
   if (domain === "electrician") {
-    const wattage = text.match(/\b(\d+)\s*watt\b/); if (wattage) attributes.wattage = Number(wattage[1]);
-    const room = text.match(/\b(kitchen|bathroom|bedroom|balcony|hall|terrace)\b/); if (room) attributes.room = room[1];
-    const brand = BRAND_NAMES.find(([name]) => new RegExp(`\\b${name}\\b`).test(text)); if (brand) attributes.brand = brand[1];
-    const appliance = text.match(/\b(fridge point|fan|motor|geyser|light|ac)\s+(?:wal|ka|ke|ki)/); if (appliance) attributes.appliance = appliance[1];
-    if (/\bfuse\s+ud\b/.test(text)) attributes.issue = "fuse blown";
-    else if (/\b(short|short circuit)\b/.test(text)) attributes.issue = "short circuit";
-    else if (/\b(current aa|jhatka)\b/.test(text)) attributes.issue = "leaking current";
-    else if (/\b(awaaz|noise)\b/.test(text)) attributes.issue = "noise";
-    else if (/\b(dheema|dheere|slow)\b/.test(text)) attributes.issue = "slow";
-    else if (/\b(chal nahi|band hai|not working)\b/.test(text)) attributes.issue = "not working";
-    else if (/\b(spark|chingari)\b/.test(text)) attributes.issue = "spark";
+    // Look for issues and problems
+    const issues = [
+      "fuse blown", "fuse", "short circuit", "no power", "flickering", "sparking",
+      "tripping", "burning", "shock", "overload"
+    ];
+    for (const issue of issues) {
+      if (normalized.includes(issue)) {
+        attributes["issue"] = issue;
+        break;
+      }
+    }
+    
+    // Look for brands - expanded
+    const brands = [
+      "havells", "anchor", "polycab", "usha", "bajaj", "crompton", "philips",
+      "siemens", "godrej", "legrand", "hager", "schneider"
+    ];
+    for (const brand of brands) {
+      if (normalized.includes(brand)) {
+        attributes["brand"] = brand;
+        break;
+      }
+    }
   }
-  if (domain === "tiffin") {
-    const meal = text.match(/\b(breakfast|lunch|dinner)\b/); if (meal) attributes.meal = meal[1];
-    const days = text.match(/\b(\d+)\s+din\b/); if (days) attributes.days = Number(days[1]);
-    const roti = text.match(/\b(\d+)\s+roti\b/); if (roti) attributes.roti_count = Number(roti[1]);
-    if (/\b(kam mirchi|mild)\b/.test(text)) attributes.spice_level = "mild";
-    else if (/\b(tez|spicy)\b/.test(text)) attributes.spice_level = "spicy";
-    else if (/\b(normal|medium)\b/.test(text)) attributes.spice_level = "medium";
-    if (/\b(aadha|half)(?:\s+portion)?\b/.test(text)) attributes.portion = "half";
-    else if (/\b(pura|full)\s+portion\b/.test(text)) attributes.portion = "full";
-    else if (/\b(zyada|extra)\s+(?:portion|quantity)?\b/.test(text)) attributes.portion = "extra";
-    if (/\bjain\s+nahi\b/.test(text)) attributes.jain = false;
-    else if (/\bjain\b/.test(text)) attributes.jain = true;
-  }
+  
   return attributes;
 }
 
-/** Extract explicit, non-negated items and attach nearby modifiers to each item. */
+// Split text into item phrases more intelligently
+function splitIntoPhrases(text: string): string[] {
+  // First try to split by common separators (aur, and, +, ;, newlines)
+  // Commas are kept if part of attribute listings, or split if introducing a distinct garment
+  let phrases = text.split(/[\n;+]|\baur\b|\band\b/i);
+  
+  // Filter and clean phrases
+  phrases = phrases
+    .map(p => p.trim())
+    .filter(p => p.length > 0);
+  
+  return phrases;
+}
+
+// Main extraction function
 export function extractItems(message: string, domain: Domain): Item[] {
-  const text = normalize(message);
-  const matches = findItems(text, domain);
-  const drafts: Draft[] = [];
-  const firstByDescription = new Map<string, Draft>();
-  for (let index = 0; index < matches.length; index += 1) {
-    const match = matches[index];
-    const end = matches[index + 1]?.start ?? text.length;
-    const attrs = attributesFor(text.slice(match.start, end), domain);
-    if (domain === "tiffin" && match.description === "roti" && match.explicitQuantity && drafts.length) {
-      const previous = drafts[drafts.length - 1];
-      previous.attributes.roti_count = match.quantity;
-      Object.assign(previous.attributes, attrs);
-      continue;
+  const items: Item[] = [];
+  const normalized = normalize(message);
+  
+  // Split into major item phrases
+  const itemPhrases = splitIntoPhrases(normalized);
+  
+  for (const phrase of itemPhrases) {
+    if (phrase.length === 0) continue;
+    
+    // Check if phrase contains comma-separated sub-phrases
+    const subPhrases = phrase.split(",").map(s => s.trim()).filter(Boolean);
+    
+    let currentItem: Item | null = null;
+    
+    for (const sub of subPhrases) {
+      const canonical = findCanonicalItemName(sub, domain);
+      const [quantity, remaining] = extractQuantity(sub);
+      const attrs = extractAttributes(sub, domain);
+      
+      if (canonical) {
+        // A new canonical garment item is introduced
+        currentItem = {
+          description: canonical,
+          quantity: Math.max(1, quantity),
+          attributes: { ...attrs },
+        };
+        items.push(currentItem);
+      } else if (currentItem) {
+        // Merge attributes into the active garment item
+        Object.assign(currentItem.attributes, attrs);
+      } else {
+        // Fallback item description
+        const fallbackDesc = extractItemDescription(remaining, domain);
+        if (fallbackDesc) {
+          currentItem = {
+            description: fallbackDesc,
+            quantity: Math.max(1, quantity),
+            attributes: { ...attrs },
+          };
+          items.push(currentItem);
+        }
+      }
     }
-    let draft = firstByDescription.get(match.description);
-    if (match.explicitQuantity || !draft) {
-      draft = { description: match.description, quantity: match.quantity, attributes: {}, firstPosition: match.start };
-      drafts.push(draft);
-      if (!firstByDescription.has(match.description)) firstByDescription.set(match.description, draft);
-    }
-    Object.assign(draft.attributes, attrs);
   }
-  if (domain === "tiffin" && /\bdono\s+me\b/.test(text)) {
-    const roti = text.match(/\b(\d+)\s+roti\b/);
-    if (roti) for (const draft of drafts) draft.attributes.roti_count = Number(roti[1]);
-  }
-  return drafts.sort((a, b) => a.firstPosition - b.firstPosition).map(({ firstPosition: _firstPosition, ...item }) => item);
+  
+  return items.length > 0 ? items : [];
 }
