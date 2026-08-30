@@ -39,11 +39,11 @@ function formatDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-// Get date at a specific time in Asia/Kolkata timezone
+// Get date at a specific time in Asia/Kolkata timezone (UTC+5:30)
 function getDateInKolkata(date: Date): Date {
-  // Create a date that represents the same calendar date in Asia/Kolkata
-  const offset = date.getTimezoneOffset() + 330; // IST is UTC+5:30
-  return new Date(date.getTime() - offset * 60 * 1000);
+  // IST is UTC+5:30 (+330 minutes). Shift by +330 minutes so getUTC*() methods return Asia/Kolkata date.
+  const IST_OFFSET_MS = 330 * 60 * 1000;
+  return new Date(date.getTime() + IST_OFFSET_MS);
 }
 
 export interface DateResult {

@@ -1,0 +1,6 @@
+{
+  "name": "OrderKaro",
+  "description": "Offline-first smart order management, shopkeeper query assistant, 3D analytics dashboard, customer billing & receipt generator, and CRDT sync relay engine.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
