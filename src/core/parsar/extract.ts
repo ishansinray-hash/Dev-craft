@@ -1,4 +1,5 @@
 import type { Domain } from "./vocab.js";
+import { COLOR_PATTERNS } from "./vocab.js";
 import { normalize } from "./normalize.js";
 
 export interface Item {
@@ -105,6 +106,16 @@ function setMeasurement(attributes: Item["attributes"], text: string, key: "ches
 
 function attributesFor(text: string, domain: Domain): Item["attributes"] {
   const attributes: Item["attributes"] = {};
+
+  // Shared palette first, so a colour no domain list carries (orange, charcoal,
+  // firozi) still lands. The domain blocks below run afterwards and overwrite
+  // it, which keeps their more precise reading — "navy blue" over "blue".
+  // Matched on word boundaries: a substring test made "lal" fire inside
+  // "khali" and "tan" inside "tantra".
+  for (const [name, value] of Object.entries(COLOR_PATTERNS)) {
+    if (new RegExp(`\\b${name}\\b`).test(text)) { attributes.color = value; break; }
+  }
+
   if (domain === "tailor") {
     const colors: Array<[RegExp, string]> = [
       [/\bbottle green\b/, "bottle green"], [/\bnavy blue\b/, "navy blue"], [/\bmaroon\b/, "maroon"],

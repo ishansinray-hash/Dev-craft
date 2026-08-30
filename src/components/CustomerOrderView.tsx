@@ -25,6 +25,10 @@ const TAILOR_PRESETS = [
     text: "Sunil bhai, 3 white linen shirts chest 42 waist 36 and 1 kurta pajama by Friday urgently, 500 advance diya",
   },
   {
+    label: "Orange Kurta & Pajama",
+    text: "Deepak bhai, 2 orange kurtas chest 42 waist 36 aur 1 white pajama by Monday, 500 advance",
+  },
+  {
     label: "Blouse & Slim Pants",
     text: "Meena aunty ke liye 2 pant chest 40, aur 1 blouse slim waist 38 chest 44, agle somwar tak chahiye",
   },
