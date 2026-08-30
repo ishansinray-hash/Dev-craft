@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite build && tsx watch server/index.ts",
+    "dev": "vite build && tsx server/index.ts",
     "build": "vite build",
     "build:client": "vite build",
-    "start": "tsx server/index.ts",
+    "start": "node dist/server.cjs",
     "relay": "tsx watch server/index.ts",
     "cli": "tsx src/cli.ts",
     "test": "vitest run",
