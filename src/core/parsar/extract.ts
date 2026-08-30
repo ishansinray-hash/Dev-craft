@@ -114,9 +114,10 @@ function extractAttributes(text: string, domain: Domain): Record<string, string 
   const normalized = normalize(text).toLowerCase();
   
   // Universal attribute extraction
-  // Look for colors
+  // Look for colors (check longest keys first)
   for (const [colorKey, colorValue] of Object.entries(COLOR_PATTERNS)) {
-    if (normalized.includes(colorKey)) {
+    const re = new RegExp(`\\b${colorKey}\\b`, "i");
+    if (re.test(normalized)) {
       attributes["color"] = colorValue;
       break;
     }
