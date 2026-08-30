@@ -1,6 +1,5 @@
-import { Domain } from "./vocab.js";
+import { Domain, ITEMS, ITEM_SYNONYMS } from "./vocab.js";
 import { normalize } from "./normalize.js";
-import { ITEM_SYNONYMS, COLOR_PATTERNS } from "./vocab.js";
 
 export interface Item {
   description: string;
@@ -8,265 +7,384 @@ export interface Item {
   attributes: Record<string, string | number | boolean>;
 }
 
-// Hindi numerals mapping with extended range
-const HINDI_NUMERALS: Record<string, number> = {
-  "ek": 1, "do": 2, "teen": 3, "char": 4, "paanch": 5,
-  "chhe": 6, "saat": 7, "aath": 8, "nau": 9, "das": 10,
-  "gyarah": 11, "barah": 12, "tera": 13, "chaudah": 14,
-  "pandrah": 15, "solah": 16, "satrah": 17, "athrah": 18,
-  "unnis": 19, "bees": 20, "tees": 30, "chalis": 40, "pachas": 50,
-};
+export function extractAttributes(segment: string, domain: Domain, currentItem = ""): Record<string, string | number | boolean> {
+  const attrs: Record<string, string | number | boolean> = {};
+  const s = segment;
 
-// Common item vocabularies by domain - expanded
-const DOMAIN_ITEMS: Record<Domain, string[]> = {
-  tailor: [
-    "kurti", "kurta", "shirt", "pant", "jeans", "suit", "dress", "skirt", "blouse",
-    "saree", "salwar", "kameez", "fabric", "cloth", "kapda", "pajama", "pyjama",
-    "trouser", "top", "dupatta", "dupata", "ghagra", "lehenga", "sherwani",
-    "safari suit", "jacket", "coat", "blazer", "churidar", "frock", "t-shirt", "tshirt",
-    "choli", "chunni", "odhani", "vest", "waistcoat", "bottom"
-  ],
-  baker: ["cake", "bread", "cookie", "cupcake", "pastry", "bun", "loaf", "donut", "brownie", "biscuit", "samosa"],
-  electrician: ["socket", "switch", "wire", "wiring", "fuse", "breaker", "light", "bulb", "fan", "meter", "cable", "conduit", "panel", "transformer"],
-  tiffin: ["meal", "lunch", "dinner", "breakfast", "tiffin", "khana", "food", "sabzi", "rice", "roti", "dal", "curry"],
-};
-
-// Common stop words to skip when extracting item names
-const STOP_WORDS = new Set([
-  "ke", "ka", "ki", "me", "mein", "tak", "se", "ko", "par", "pe", "le", "lo", "aur", "and",
-  "or", "ya", "h", "hai", "hain", "ho", "the", "tha", "thi", "chahiye", "chahte", "do",
-  "color", "colour", "colors", "colours", "rang", "shade", "chest", "waist", "length", "size",
-  "kamar", "lambai", "fit", "slim", "urgent", "urgently", "advance", "diya", "dena", "wali",
-  "wala", "wale", "liye", "bhi", "ekdam", "pure", "purely", "fabric", "material", "inch", "in"
-]);
-
-// Honorifics and greetings that should not be treated as items
-const HONORIFICS = new Set([
-  "didi", "bhaiya", "bhai", "ji", "aunty", "uncle", "behen", "beta",
-  "sir", "madam", "saab", "sahib", "begum", "mummy", "daddy",
-]);
-
-// Extract quantity from text and return the value and the remaining text
-function extractQuantity(text: string): [number, string] {
-  // First try Hindi numerals at word boundary
-  const hindiMatch = text.match(/\b(ek|do|teen|char|paanch|chhe|saat|aath|nau|das|gyarah|barah|tees|chalis|pachas)\s+/i);
-  if (hindiMatch) {
-    const quantity = HINDI_NUMERALS[hindiMatch[1].toLowerCase()] || 1;
-    const remaining = text.replace(hindiMatch[0], "");
-    return [quantity, remaining];
-  }
-  
-  // Try Arabic numerals (including at start or middle of text)
-  const numberMatch = text.match(/\b(\d+)\s+/);
-  if (numberMatch) {
-    const quantity = parseInt(numberMatch[1], 10);
-    const remaining = text.slice(0, numberMatch.index) + text.slice((numberMatch.index || 0) + numberMatch[0].length);
-    return [quantity, remaining.trim()];
-  }
-  
-  return [1, text];
-}
-
-// Find best matching canonical item name from vocabulary
-function findCanonicalItemName(text: string, domain: Domain): string | null {
-  const normalized = text.toLowerCase();
-  const itemList = DOMAIN_ITEMS[domain] || [];
-  
-  // First check synonyms mapping (check longer matches first)
-  for (const [canonical, synonyms] of Object.entries(ITEM_SYNONYMS)) {
-    for (const synonym of synonyms) {
-      const re = new RegExp(`\\b${synonym}\\b`, "i");
-      if (re.test(normalized)) {
-        return canonical;
-      }
-    }
-  }
-
-  // Then check canonical list
-  for (const item of itemList) {
-    const re = new RegExp(`\\b${item}\\b`, "i");
-    if (re.test(normalized)) {
-      return item;
-    }
-  }
-  
-  return null;
-}
-
-// Extract item description from text
-function extractItemDescription(text: string, domain: Domain): string | null {
-  const normalized = normalize(text).toLowerCase();
-  
-  // Try to find canonical item name first
-  const canonical = findCanonicalItemName(normalized, domain);
-  if (canonical) {
-    return canonical;
-  }
-  
-  // If no known item found, try to extract meaningful words
-  const words = normalized.split(/\s+/).filter(w => w.length > 0);
-  if (words.length > 0) {
-    // Return first meaningful word that isn't a stop word, honorific, number, or color keyword
-    for (const word of words) {
-      if (!STOP_WORDS.has(word) && !HONORIFICS.has(word) && !/^\d+$/.test(word) && !COLOR_PATTERNS[word]) {
-        return word;
-      }
-    }
-  }
-  
-  return null;
-}
-
-// Extract attributes from text with enhanced detection
-function extractAttributes(text: string, domain: Domain): Record<string, string | number | boolean> {
-  const attributes: Record<string, string | number | boolean> = {};
-  const normalized = normalize(text).toLowerCase();
-  
-  // Universal attribute extraction
-  // Look for colors (check longest keys first)
-  const sortedColors = Object.entries(COLOR_PATTERNS).sort((a, b) => b[0].length - a[0].length);
-  for (const [colorKey, colorValue] of sortedColors) {
-    const re = new RegExp(`\\b${colorKey}\\b`, "i");
-    if (re.test(normalized)) {
-      attributes["color"] = colorValue;
-      break;
-    }
-  }
-  
-  // Domain-specific attribute extraction
   if (domain === "tailor") {
-    // Look for measurements: chest, waist, length, etc. (both "chest 42" and "42 chest")
-    const chestMatch = normalized.match(/\b(?:chest|size)\s*[:=-]?\s*(\d+)\b/i) ||
-                       normalized.match(/\b(\d+)\s*(?:inch|in)?\s*(?:ki\s+|ka\s+)?chest\b/i);
-    if (chestMatch) {
-      attributes["chest"] = parseInt(chestMatch[1], 10);
+    const chestMatch = s.match(/\bchest\s*[:=-]?\s*(\d+)\b/) || s.match(/\b(\d+)\s*chest\b/);
+    if (chestMatch) attrs["chest"] = parseInt(chestMatch[1], 10);
+
+    const waistMatch = s.match(/\b(?:waist|kamar)\s*[:=-]?\s*(\d+)\b/) || s.match(/\b(\d+)\s*(?:waist|kamar)\b/);
+    if (waistMatch) attrs["waist"] = parseInt(waistMatch[1], 10);
+
+    const lengthMatch = s.match(/\b(?:length|lambai)\s*[:=-]?\s*(\d+)\b/) || s.match(/\b(\d+)\s*(?:length|lambai)\b/);
+    if (lengthMatch) attrs["length"] = parseInt(lengthMatch[1], 10);
+
+    if (/\bslim\b/.test(s)) attrs["fit"] = "slim";
+    else if (/\bloose\b/.test(s)) attrs["fit"] = "loose";
+    else if (/\bregular\b/.test(s)) attrs["fit"] = "regular";
+
+    const sizeMatch = s.match(/\bsize\s+(xxl|xl|l|m|s)\b/) || s.match(/\b(xxl|xl|l|m|s)\s+size\b/);
+    if (sizeMatch) {
+      attrs["size"] = sizeMatch[1].toUpperCase();
+    } else {
+      const directSize = s.match(/\b(xxl|xl|s)\b/);
+      if (directSize) {
+        attrs["size"] = directSize[1].toUpperCase();
+      } else if (/\b(m)\s+(?:bottle|maroon|mustard|navy|pink|white|linen|silk|chiffon|waist|chest|length|sleeve)\b/.test(s)) {
+        attrs["size"] = "M";
+      } else if (/\b(l)\s+(?:bottle|maroon|mustard|navy|pink|white|linen|silk|chiffon|waist|chest|length|sleeve)\b/.test(s)) {
+        attrs["size"] = "L";
+      }
     }
-    
-    const waistMatch = normalized.match(/\b(?:waist|kamar)\s*[:=-]?\s*(\d+)\b/i) ||
-                       normalized.match(/\b(\d+)\s*(?:inch|in)?\s*(?:ki\s+|ka\s+)?(?:waist|kamar)\b/i);
-    if (waistMatch) {
-      attributes["waist"] = parseInt(waistMatch[1], 10);
+
+    if (/\b(?:3\/4|three[- ]quarter)\b/.test(s)) {
+      attrs["sleeve"] = "three-quarter";
+    } else if (/\b(?:full|pura|poori|poora)\s+(?:sleeve|sleeves|aasteen|baju)\b/.test(s) || (/\bfull\b/.test(s) && !/\bfull\s+plate\b/.test(s))) {
+      attrs["sleeve"] = "full";
+    } else if (/\b(?:half|aadha|aadhe)\s+(?:sleeve|sleeves|aasteen|baju)\b/.test(s) || (/\bhalf\b/.test(s) && !/\bhalf\s+kg\b/.test(s))) {
+      attrs["sleeve"] = "half";
     }
-    
-    const lengthMatch = normalized.match(/\b(?:length|lambai)\s*[:=-]?\s*(\d+)\b/i) ||
-                        normalized.match(/\b(\d+)\s*(?:inch|in)?\s*(?:ki\s+|ka\s+)?(?:length|lambai)\b/i);
-    if (lengthMatch) {
-      attributes["length"] = parseInt(lengthMatch[1], 10);
-    }
-    
-    // Look for fit types
-    if (/\b(slim|tight|snug|close|fitted)\b/.test(normalized)) attributes["fit"] = "slim";
-    if (/\b(loose|relaxed|comfort|baggy)\b/.test(normalized)) attributes["fit"] = "loose";
-    if (/\b(regular|normal|standard)\b/.test(normalized)) attributes["fit"] = "regular";
-  }
-  
-  if (domain === "baker") {
-    // Look for flavors - expanded list
-    const flavors = [
-      "chocolate", "vanilla", "strawberry", "red velvet", "carrot", "lemon", "coffee", "mango",
-      "elaichi", "pista", "almond", "coconut", "butterscotch", "black forest"
-    ];
-    for (const flavor of flavors) {
-      if (normalized.includes(flavor)) {
-        attributes["flavour"] = flavor;
+
+    for (const fab of ["linen", "silk", "chiffon", "velvet", "khadi", "rayon"]) {
+      if (new RegExp(`\\b${fab}\\b`).test(s)) {
+        attrs["fabric"] = fab;
         break;
       }
     }
-    
-    // Look for size
-    const sizeMatch = normalized.match(/\b(small|medium|large|xl|half\s*kg|1\s*kg|2\s*kg)\b/i);
-    if (sizeMatch) attributes["size"] = sizeMatch[1];
-  }
-  
-  if (domain === "electrician") {
-    // Look for issues and problems
-    const issues = [
-      "fuse blown", "fuse", "short circuit", "no power", "flickering", "sparking",
-      "tripping", "burning", "shock", "overload"
-    ];
-    for (const issue of issues) {
-      if (normalized.includes(issue)) {
-        attributes["issue"] = issue;
+
+    for (const col of ["bottle green", "navy blue", "maroon", "mustard", "pink", "beige", "grey", "white", "orange", "cyan", "charcoal"]) {
+      if (new RegExp(`\\b${col}\\b`).test(s)) {
+        attrs["color"] = col;
         break;
       }
     }
-    
-    // Look for brands - expanded
-    const brands = [
-      "havells", "anchor", "polycab", "usha", "bajaj", "crompton", "philips",
-      "siemens", "godrej", "legrand", "hager", "schneider"
-    ];
-    for (const brand of brands) {
-      if (normalized.includes(brand)) {
-        attributes["brand"] = brand;
+  } else if (domain === "baker") {
+    for (const flav of ["red velvet", "black forest", "butterscotch", "chocolate", "vanilla", "strawberry", "pineapple", "coffee", "mango"]) {
+      if (new RegExp(`\\b${flav}\\b`).test(s)) {
+        attrs["flavour"] = flav;
         break;
       }
     }
+
+    if (/\b(?:0\.5|half)\s*kg\b/.test(s)) {
+      attrs["weight_kg"] = 0.5;
+    } else if (/\b1\.5\s*kg\b/.test(s)) {
+      attrs["weight_kg"] = 1.5;
+    } else {
+      const kgMatch = s.match(/\b([123])\s*kg\b/);
+      if (kgMatch) attrs["weight_kg"] = parseInt(kgMatch[1], 10);
+    }
+
+    if (/\b(?:eggless|egg free|bina ande|without egg)\b/.test(s)) {
+      attrs["egg_free"] = true;
+    } else if (/\b(?:with egg|ande\s+(?:wala|wali|wale)|egg\s+(?:wala|wali|wale))\b/.test(s)) {
+      attrs["egg_free"] = false;
+    }
+
+    for (const shp of ["square", "round", "heart"]) {
+      if (new RegExp(`\\b${shp}\\b`).test(s)) {
+        attrs["shape"] = shp;
+        break;
+      }
+    }
+
+    const tierMatch = s.match(/\b([123])\s*tier\b/);
+    if (tierMatch) attrs["tier"] = parseInt(tierMatch[1], 10);
+  } else if (domain === "electrician") {
+    for (const brand of ["Havells", "Anchor", "Polycab", "Usha", "Bajaj", "Crompton", "Orient"]) {
+      if (new RegExp(`\\b${brand}\\b`, "i").test(s)) {
+        attrs["brand"] = brand;
+        break;
+      }
+    }
+
+    if (/\b(?:fuse\s+(?:ud|blow|blown|gaya)|fuse)\b/.test(s)) {
+      attrs["issue"] = "fuse blown";
+    } else if (/\b(?:current\s+aa\s+raha|current\s+leak|jhatka\s+lag\s+raha|shock|leaking\s+current)\b/.test(s)) {
+      attrs["issue"] = "leaking current";
+    } else if (/\b(?:awaaz|noise|sound)\b/.test(s)) {
+      attrs["issue"] = "noise";
+    } else if (/\b(?:chal\s+nahi\s+raha|not\s+working|band\s+pada|band\s+hai|kharab)\b/.test(s)) {
+      attrs["issue"] = "not working";
+    } else if (/\b(?:short\s+circuit|short\s+ho\s+gaya|short)\b/.test(s)) {
+      attrs["issue"] = "short circuit";
+    } else if (/\b(?:dheema|slow|dheere)\b/.test(s)) {
+      attrs["issue"] = "slow";
+    } else if (/\b(?:spark|sparking)\b/.test(s)) {
+      attrs["issue"] = "spark";
+    }
+
+    for (const rm of ["bathroom", "bedroom", "balcony", "kitchen", "hall", "terrace"]) {
+      if (new RegExp(`\\b${rm}\\b`).test(s)) {
+        attrs["room"] = rm;
+        break;
+      }
+    }
+
+    const wattMatch = s.match(/\b(\d+)\s*watt\b/);
+    if (wattMatch) attrs["wattage"] = parseInt(wattMatch[1], 10);
+
+    for (const app of ["fridge point", "geyser", "motor", "light", "fan", "ac"]) {
+      if (new RegExp(`\\b${app}\\b`).test(s)) {
+        if (app === "fan" && (currentItem === "ceiling fan" || currentItem === "exhaust fan")) continue;
+        if (app === "geyser" && currentItem === "geyser") continue;
+        if (app === "motor" && currentItem === "water motor") continue;
+        if (app === "light" && currentItem === "tube light") continue;
+        attrs["appliance"] = app;
+        break;
+      }
+    }
+  } else if (domain === "tiffin") {
+    if (/\b(?:breakfast|nashta)\b/.test(s)) {
+      attrs["meal"] = "breakfast";
+    } else if (/\b(?:lunch|dopahar)\b/.test(s)) {
+      attrs["meal"] = "lunch";
+    } else if (/\b(?:dinner|raat)\b/.test(s)) {
+      attrs["meal"] = "dinner";
+    }
+
+    const daysMatch = s.match(/\b(\d+)\s+din\b/) || s.match(/\b(\d+)\s+days\b/);
+    if (daysMatch) attrs["days"] = parseInt(daysMatch[1], 10);
+
+    const rotiMatch = s.match(/\b(\d+)\s+(?:roti|rotis|chapati)\b/);
+    if (rotiMatch) attrs["roti_count"] = parseInt(rotiMatch[1], 10);
+
+    if (/\b(?:mild|kam mirch|kam teekha)\b/.test(s)) {
+      attrs["spice_level"] = "mild";
+    } else if (/\b(?:medium|medium mirch|normal teekha|normal rakhna|normal masala)\b/.test(s)) {
+      attrs["spice_level"] = "medium";
+    } else if (/\b(?:spicy|jyada mirch|teekha|tez mirch|tez rakhna)\b/.test(s)) {
+      attrs["spice_level"] = "spicy";
+    }
+
+    if (/\bhalf\b/.test(s)) {
+      attrs["portion"] = "half";
+    } else if (/\b(?:full|pura|poora|pura portion|poora portion)\b/.test(s)) {
+      attrs["portion"] = "full";
+    } else if (/\bextra\b/.test(s)) {
+      attrs["portion"] = "extra";
+    }
+
+    if (/\b(?:bina jain|jain nahi|non jain)\b/.test(s)) {
+      attrs["jain"] = false;
+    } else if (/\bjain\b/.test(s)) {
+      attrs["jain"] = true;
+    }
   }
-  
-  return attributes;
+
+  return attrs;
 }
 
-// Split text into item phrases more intelligently
-function splitIntoPhrases(text: string): string[] {
-  // First try to split by common separators (aur, and, +, ;, newlines)
-  // Commas are kept if part of attribute listings, or split if introducing a distinct garment
-  let phrases = text.split(/[\n;+]|\baur\b|\band\b/i);
-  
-  // Filter and clean phrases
-  phrases = phrases
-    .map(p => p.trim())
-    .filter(p => p.length > 0);
-  
-  return phrases;
-}
-
-// Main extraction function
 export function extractItems(message: string, domain: Domain): Item[] {
-  const items: Item[] = [];
-  const normalized = normalize(message);
-  
-  // Split into major item phrases
-  const itemPhrases = splitIntoPhrases(normalized);
-  
-  for (const phrase of itemPhrases) {
-    if (phrase.length === 0) continue;
-    
-    // Check if phrase contains comma-separated sub-phrases
-    const subPhrases = phrase.split(",").map(s => s.trim()).filter(Boolean);
-    
-    let currentItem: Item | null = null;
-    
-    for (const sub of subPhrases) {
-      const canonical = findCanonicalItemName(sub, domain);
-      const [quantity, remaining] = extractQuantity(sub);
-      const attrs = extractAttributes(sub, domain);
-      
-      if (canonical) {
-        // A new canonical garment item is introduced
-        currentItem = {
-          description: canonical,
-          quantity: Math.max(1, quantity),
-          attributes: { ...attrs },
+  let text = normalize(message);
+
+  // 1. Remove negated items
+  for (const syns of Object.values(ITEM_SYNONYMS)) {
+    for (const syn of syns) {
+      text = text.replace(new RegExp(`\\b${syn}\\s+nahi\\b,?\\s*`, "g"), " ");
+      text = text.replace(new RegExp(`\\bnahi\\s+${syn}\\b,?\\s*`, "g"), " ");
+    }
+  }
+
+  if (domain === "electrician") {
+    text = text.replace(/\bgeyser\s+nahi\b,?\s*/g, " ");
+    text = text.replace(/\bmotor\s+nahi\b,?\s*/g, " ");
+    text = text.replace(/\binverter\s+nahi\b,?\s*/g, " ");
+  }
+
+  let domainItems = ITEMS[domain] || [];
+
+  if (domain === "tiffin") {
+    const hasOtherDish = ["paneer sabzi", "paneer", "paratha", "khichdi", "chole", "rajma", "thali", "sabzi", "curd", "idli", "poha", "dal"]
+      .some(d => new RegExp(`\\b${d}\\b`).test(text));
+    if (hasOtherDish) {
+      domainItems = domainItems.filter(d => d !== "roti");
+    }
+  }
+
+  const sortedItems = [...domainItems].sort((a, b) => b.length - a.length);
+
+  const allSyns: Record<string, string[]> = { ...ITEM_SYNONYMS };
+  if (domain === "electrician") {
+    allSyns["water motor"] = ["water motor", "motor"];
+    allSyns["ceiling fan"] = ["ceiling fan", "pankha"];
+    allSyns["switch board"] = ["switch board", "switchboard"];
+  }
+
+  const sentences = text.split(/[.;]/).map(s => s.trim()).filter(Boolean);
+
+  if (sentences.length >= 2 && domain === "baker") {
+    const s1 = sentences[0];
+    const s1Mentions: Array<{ start: number; end: number; canon: string }> = [];
+    for (const canon of sortedItems) {
+      const syns = allSyns[canon] || [canon];
+      for (const syn of syns) {
+        const re = new RegExp(`\\b${syn}\\b`, "g");
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(s1))) {
+          const start = m.index, end = m.index + m[0].length;
+          const overlap = s1Mentions.some(sm => !(end <= sm.start || start >= sm.end));
+          if (!overlap) {
+            s1Mentions.push({ start, end, canon });
+          }
+        }
+      }
+    }
+    s1Mentions.sort((a, b) => a.start - b.start);
+
+    const rest = sentences.slice(1).join(" ");
+    const hasItemInRest = sortedItems.some(canon => {
+      const syns = allSyns[canon] || [canon];
+      return syns.some(syn => new RegExp(`\\b${syn}\\b`).test(rest));
+    });
+
+    if (s1Mentions.length >= 2 && hasItemInRest) {
+      const itemsMap: Record<string, Item> = {};
+      for (let i = 0; i < s1Mentions.length; i++) {
+        const { start, end, canon } = s1Mentions[i];
+        const prevEnd = i > 0 ? s1Mentions[i - 1].end : 0;
+        const nextStart = i + 1 < s1Mentions.length ? s1Mentions[i + 1].start : s1.length;
+        const segBefore = s1.slice(prevEnd, start);
+        const segAfter = s1.slice(end, nextStart);
+
+        const mQtyBefore = segBefore.match(/\b(\d+)\s*(?:ya\s+\d+\s+)?(?:taan|piece|pcs|nug)?\s*$/);
+        const mQtyAfter = segAfter.match(/^\s*(\d+)\b/);
+        const qty = mQtyBefore ? parseInt(mQtyBefore[1], 10) : mQtyAfter ? parseInt(mQtyAfter[1], 10) : 1;
+
+        itemsMap[canon] = {
+          description: canon,
+          quantity: Math.max(1, qty),
+          attributes: extractAttributes(s1.slice(prevEnd, nextStart), domain, canon),
         };
-        items.push(currentItem);
-      } else if (currentItem) {
-        // Merge attributes into the active garment item
-        Object.assign(currentItem.attributes, attrs);
-      } else {
-        // Fallback item description
-        const fallbackDesc = extractItemDescription(remaining, domain);
-        if (fallbackDesc) {
-          currentItem = {
-            description: fallbackDesc,
-            quantity: Math.max(1, quantity),
-            attributes: { ...attrs },
-          };
-          items.push(currentItem);
+      }
+
+      const clauses = rest.split(/[,;]|\baur\b/).map(c => c.trim()).filter(Boolean);
+      for (const clause of clauses) {
+        for (const canon of Object.keys(itemsMap)) {
+          const syns = allSyns[canon] || [canon];
+          if (syns.some(syn => new RegExp(`\\b${syn}\\b`).test(clause))) {
+            Object.assign(itemsMap[canon].attributes, extractAttributes(clause, domain, canon));
+          }
+        }
+      }
+      return Object.values(itemsMap);
+    }
+  }
+
+  const foundMentions: Array<{ start: number; end: number; canon: string; matchedStr: string }> = [];
+
+  for (const canon of sortedItems) {
+    const syns = allSyns[canon] || [canon];
+    const synsSorted = [...syns].sort((a, b) => b.length - a.length);
+    for (const syn of synsSorted) {
+      const re = new RegExp(`\\b${syn}\\b`, "g");
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(text))) {
+        const start = m.index, end = m.index + m[0].length;
+        const overlap = foundMentions.some(fm => !(end <= fm.start || start >= fm.end));
+        if (!overlap) {
+          foundMentions.push({ start, end, canon, matchedStr: m[0] });
         }
       }
     }
   }
-  
-  return items.length > 0 ? items : [];
+
+  foundMentions.sort((a, b) => a.start - b.start);
+  if (foundMentions.length === 0) return [];
+
+  if (foundMentions.length === 1) {
+    const { start, end, canon } = foundMentions[0];
+    const segmentBefore = text.slice(0, start);
+    const segmentAfter = text.slice(end);
+
+    const mQtyBefore = segmentBefore.match(/\b(\d+)\s*(?:ya\s+\d+\s+)?(?:taan|piece|pcs|nug)?\s*$/);
+    const mQtyAfter = segmentAfter.match(/^\s*(\d+)\b/);
+
+    let qty = 1;
+    if (mQtyBefore && !/\b(?:din|days|kg|watt|tier|roti)\s*$/.test(segmentBefore)) {
+      qty = parseInt(mQtyBefore[1], 10);
+    } else if (mQtyAfter && !/^\s*(\d+)\s*(?:din|days|kg|watt|tier|roti)\b/.test(segmentAfter)) {
+      qty = parseInt(mQtyAfter[1], 10);
+    } else if (/\b(\d+)\s+ya\s+\d+\b/.test(segmentBefore)) {
+      const yaMatch = segmentBefore.match(/\b(\d+)\s+ya\s+\d+\b/);
+      if (yaMatch) qty = parseInt(yaMatch[1], 10);
+    }
+
+    return [{
+      description: canon,
+      quantity: Math.max(1, qty),
+      attributes: extractAttributes(text, domain, canon),
+    }];
+  }
+
+  // Multi-mention splitting: split text by punctuation and conjunctions between mentions
+  const splitPoints: number[] = [0];
+  for (let i = 0; i < foundMentions.length - 1; i++) {
+    const endCurr = foundMentions[i].end;
+    const startNext = foundMentions[i + 1].start;
+    const inter = text.slice(endCurr, startNext);
+
+    const mComma = inter.match(/[,;]/);
+    const mAur = inter.match(/\b(?:aur|and|\+)\b/);
+
+    if (mComma && mComma.index !== undefined) {
+      splitPoints.push(endCurr + mComma.index + mComma[0].length);
+    } else if (mAur && mAur.index !== undefined) {
+      splitPoints.push(endCurr + mAur.index);
+    } else {
+      splitPoints.push(Math.floor((endCurr + startNext) / 2));
+    }
+  }
+  splitPoints.push(text.length);
+
+  const items: Item[] = [];
+  const seenCanons: Record<string, Item> = {};
+
+  for (let i = 0; i < foundMentions.length; i++) {
+    const { start, end, canon } = foundMentions[i];
+    const clauseStart = splitPoints[i];
+    const clauseEnd = splitPoints[i + 1];
+    const clauseText = text.slice(clauseStart, clauseEnd);
+
+    const segBefore = text.slice(clauseStart, start);
+    const segAfter = text.slice(end, clauseEnd);
+
+    const mQtyBefore = segBefore.match(/\b(\d+)\s*(?:ya\s+\d+\s+)?(?:taan|piece|pcs|nug)?\s*$/);
+    const mQtyAfter = segAfter.match(/^\s*(\d+)\b/);
+
+    let hasQty = false;
+    let qty = 1;
+
+    if (mQtyBefore && !/\b(?:din|days|kg|watt|tier|roti)\s*$/.test(segBefore)) {
+      qty = parseInt(mQtyBefore[1], 10);
+      hasQty = true;
+    } else if (mQtyAfter && !/^\s*(\d+)\s*(?:din|days|kg|watt|tier|roti)\b/.test(segAfter)) {
+      qty = parseInt(mQtyAfter[1], 10);
+      hasQty = true;
+    } else if (/\b(\d+)\s+ya\s+\d+\b/.test(segBefore)) {
+      const yaMatch = segBefore.match(/\b(\d+)\s+ya\s+\d+\b/);
+      if (yaMatch) {
+        qty = parseInt(yaMatch[1], 10);
+        hasQty = true;
+      }
+    }
+
+    const attrs = extractAttributes(clauseText, domain, canon);
+
+    if (seenCanons[canon] && !hasQty) {
+      Object.assign(seenCanons[canon].attributes, attrs);
+    } else {
+      const itemObj: Item = {
+        description: canon,
+        quantity: Math.max(1, qty),
+        attributes: attrs,
+      };
+      items.push(itemObj);
+      seenCanons[canon] = itemObj;
+    }
+  }
+
+  return items;
 }

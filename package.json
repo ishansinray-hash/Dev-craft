@@ -13,7 +13,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "eval": "node eval.mjs",
-    "score": "python Given_materials/score.py"
+    "score": "python3 Given_materials/score.py"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

@@ -57,7 +57,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -75,7 +75,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -136,9 +136,9 @@
    }
   ],
   "due_date": "2026-10-09",
-  "amount": 300,
+  "amount": 300.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -174,7 +174,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -191,7 +191,7 @@
    }
   ],
   "due_date": null,
-  "amount": 1500,
+  "amount": 1500.0,
   "references_prior_order": false,
   "confidence": 0.6,
   "needs_clarification": true
@@ -220,7 +220,7 @@
   "due_date": "2026-09-23",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -248,7 +248,7 @@
   "due_date": "2026-10-18",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -274,7 +274,7 @@
   "due_date": "2026-09-18",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -291,7 +291,7 @@
    }
   ],
   "due_date": "2026-10-15",
-  "amount": 2500,
+  "amount": 2500.0,
   "references_prior_order": false,
   "confidence": 0.6,
   "needs_clarification": true
@@ -323,7 +323,7 @@
   "due_date": "2026-09-30",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -377,7 +377,7 @@
   "due_date": "2026-08-30",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -396,7 +396,7 @@
   "due_date": "2026-09-01",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -410,7 +410,7 @@
    }
   ],
   "due_date": "2026-11-08",
-  "amount": 250,
+  "amount": 250.0,
   "references_prior_order": true,
   "confidence": 0.9,
   "needs_clarification": false
@@ -448,7 +448,7 @@
   "due_date": "2026-10-10",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -466,9 +466,9 @@
    }
   ],
   "due_date": "2026-09-09",
-  "amount": 500,
+  "amount": 500.0,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -512,7 +512,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -537,9 +537,9 @@
    }
   ],
   "due_date": "2026-09-03",
-  "amount": 250,
+  "amount": 250.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -557,9 +557,9 @@
    }
   ],
   "due_date": "2026-08-31",
-  "amount": 300,
+  "amount": 300.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -579,7 +579,7 @@
   "due_date": "2026-09-05",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -617,7 +617,7 @@
   "due_date": "2026-10-03",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -636,7 +636,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -672,7 +672,7 @@
    }
   ],
   "due_date": "2026-09-01",
-  "amount": 650,
+  "amount": 650.0,
   "references_prior_order": false,
   "confidence": 0.6,
   "needs_clarification": true
@@ -693,7 +693,7 @@
   "due_date": "2026-08-22",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -765,7 +765,7 @@
   "due_date": "2026-08-20",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -781,9 +781,9 @@
    }
   ],
   "due_date": "2026-09-15",
-  "amount": 1200,
+  "amount": 1200.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -827,7 +827,7 @@
   "due_date": "2026-10-18",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -843,7 +843,7 @@
    }
   ],
   "due_date": null,
-  "amount": 1500,
+  "amount": 1500.0,
   "references_prior_order": false,
   "confidence": 0.6,
   "needs_clarification": true
@@ -897,7 +897,7 @@
   "due_date": "2026-08-20",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -931,7 +931,7 @@
   "due_date": "2026-09-27",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -994,7 +994,7 @@
   "due_date": "2026-10-07",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1032,7 +1032,7 @@
   "due_date": "2026-09-19",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1065,7 +1065,7 @@
   "due_date": "2026-09-28",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1116,9 +1116,9 @@
    }
   ],
   "due_date": "2026-09-18",
-  "amount": 450,
+  "amount": 450.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1143,9 +1143,9 @@
    }
   ],
   "due_date": "2026-10-05",
-  "amount": 500,
+  "amount": 500.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1206,7 +1206,7 @@
   "due_date": "2026-10-03",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1241,9 +1241,9 @@
    }
   ],
   "due_date": "2026-08-29",
-  "amount": 450,
+  "amount": 450.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1264,7 +1264,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1291,7 +1291,7 @@
   "due_date": "2026-08-22",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1315,9 +1315,9 @@
    }
   ],
   "due_date": "2026-08-27",
-  "amount": 650,
+  "amount": 650.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1342,9 +1342,9 @@
    }
   ],
   "due_date": "2026-09-03",
-  "amount": 500,
+  "amount": 500.0,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1379,7 +1379,7 @@
   "due_date": "2026-09-11",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1402,9 +1402,9 @@
    }
   ],
   "due_date": "2026-09-11",
-  "amount": 1500,
+  "amount": 1500.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1458,7 +1458,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1477,7 +1477,7 @@
   "due_date": "2026-10-13",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1542,7 +1542,7 @@
    }
   ],
   "due_date": "2026-08-29",
-  "amount": 500,
+  "amount": 500.0,
   "references_prior_order": false,
   "confidence": 0.9,
   "needs_clarification": false
@@ -1582,7 +1582,7 @@
    }
   ],
   "due_date": "2026-10-18",
-  "amount": 650,
+  "amount": 650.0,
   "references_prior_order": false,
   "confidence": 0.9,
   "needs_clarification": false
@@ -1603,7 +1603,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1733,7 +1733,7 @@
   "due_date": "2026-09-28",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1755,7 +1755,7 @@
    }
   ],
   "due_date": "2026-09-28",
-  "amount": 300,
+  "amount": 300.0,
   "references_prior_order": false,
   "confidence": 0.9,
   "needs_clarification": false
@@ -1807,7 +1807,7 @@
   "due_date": "2026-09-25",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1827,7 +1827,7 @@
   "due_date": "2026-11-08",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1845,7 +1845,7 @@
    }
   ],
   "due_date": null,
-  "amount": 500,
+  "amount": 500.0,
   "references_prior_order": false,
   "confidence": 0.6,
   "needs_clarification": true
@@ -1873,7 +1873,7 @@
   "due_date": "2026-09-07",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1901,7 +1901,7 @@
   "due_date": "2026-09-14",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1928,7 +1928,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1947,7 +1947,7 @@
   "due_date": "2026-10-10",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -1973,7 +1973,7 @@
   "due_date": "2026-09-21",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2000,7 +2000,7 @@
   "due_date": "2026-09-01",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2018,7 +2018,7 @@
   "due_date": "2026-08-24",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2060,7 +2060,7 @@
   "due_date": "2026-09-12",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2092,7 +2092,7 @@
    }
   ],
   "due_date": "2026-09-06",
-  "amount": 650,
+  "amount": 650.0,
   "references_prior_order": false,
   "confidence": 0.5,
   "needs_clarification": true
@@ -2113,7 +2113,7 @@
   "due_date": "2026-09-26",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2240,7 +2240,7 @@
   "due_date": "2026-10-07",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2293,7 +2293,7 @@
    }
   ],
   "due_date": null,
-  "amount": 1500,
+  "amount": 1500.0,
   "references_prior_order": false,
   "confidence": 0.6,
   "needs_clarification": true
@@ -2313,7 +2313,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2347,7 +2347,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2364,7 +2364,7 @@
    }
   ],
   "due_date": "2026-08-22",
-  "amount": 1500,
+  "amount": 1500.0,
   "references_prior_order": true,
   "confidence": 0.6,
   "needs_clarification": true
@@ -2387,7 +2387,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2403,7 +2403,7 @@
    }
   ],
   "due_date": null,
-  "amount": 650,
+  "amount": 650.0,
   "references_prior_order": false,
   "confidence": 0.6,
   "needs_clarification": true
@@ -2448,7 +2448,7 @@
   "due_date": "2026-09-26",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2586,7 +2586,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2671,7 +2671,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2690,7 +2690,7 @@
   "due_date": "2026-08-22",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2718,7 +2718,7 @@
   "due_date": "2026-09-02",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2744,7 +2744,7 @@
   "due_date": "2026-09-10",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2796,7 +2796,7 @@
   "due_date": "2026-10-20",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2804,7 +2804,7 @@
   "customer": null,
   "items": [],
   "due_date": "2026-10-08",
-  "amount": 650,
+  "amount": 650.0,
   "references_prior_order": false,
   "confidence": 0.3,
   "needs_clarification": true
@@ -2834,7 +2834,7 @@
   "due_date": "2026-10-21",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2856,7 +2856,7 @@
    }
   ],
   "due_date": "2026-09-22",
-  "amount": 200,
+  "amount": 200.0,
   "references_prior_order": false,
   "confidence": 0.9,
   "needs_clarification": false
@@ -2876,7 +2876,7 @@
   "due_date": "2026-09-25",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -2917,7 +2917,7 @@
    }
   ],
   "due_date": "2026-09-17",
-  "amount": 450,
+  "amount": 450.0,
   "references_prior_order": false,
   "confidence": 0.5,
   "needs_clarification": true
@@ -2945,9 +2945,9 @@
    }
   ],
   "due_date": "2026-10-17",
-  "amount": 650,
+  "amount": 650.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3000,7 +3000,7 @@
   "due_date": "2026-09-18",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3008,7 +3008,7 @@
   "customer": null,
   "items": [],
   "due_date": "2026-08-24",
-  "amount": 200,
+  "amount": 200.0,
   "references_prior_order": true,
   "confidence": 0.3,
   "needs_clarification": true
@@ -3033,7 +3033,7 @@
    }
   ],
   "due_date": null,
-  "amount": 200,
+  "amount": 200.0,
   "references_prior_order": false,
   "confidence": 0.9,
   "needs_clarification": false
@@ -3054,7 +3054,7 @@
   "due_date": "2026-08-26",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3081,7 +3081,7 @@
   "due_date": "2026-10-04",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3132,9 +3132,9 @@
    }
   ],
   "due_date": null,
-  "amount": 1200,
+  "amount": 1200.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3171,7 +3171,7 @@
   "due_date": "2026-09-22",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3226,7 +3226,7 @@
   "due_date": "2026-10-11",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3251,9 +3251,9 @@
    }
   ],
   "due_date": "2026-08-25",
-  "amount": 450,
+  "amount": 450.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3278,7 +3278,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3316,9 +3316,9 @@
    }
   ],
   "due_date": "2026-09-29",
-  "amount": 650,
+  "amount": 650.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3364,7 +3364,7 @@
   "due_date": "2026-09-15",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3383,7 +3383,7 @@
   "due_date": "2026-10-09",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3402,7 +3402,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3448,7 +3448,7 @@
   "due_date": "2026-09-22",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3475,7 +3475,7 @@
   "due_date": "2026-08-24",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3509,7 +3509,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3561,9 +3561,9 @@
    }
   ],
   "due_date": null,
-  "amount": 250,
+  "amount": 250.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3606,7 +3606,7 @@
   "due_date": "2026-09-11",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3648,7 +3648,7 @@
   "due_date": "2026-08-19",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3671,7 +3671,7 @@
    }
   ],
   "due_date": "2026-09-17",
-  "amount": 800,
+  "amount": 800.0,
   "references_prior_order": true,
   "confidence": 0.9,
   "needs_clarification": false
@@ -3706,7 +3706,7 @@
   "due_date": "2026-09-19",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3743,7 +3743,7 @@
   "due_date": "2026-08-23",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3760,7 +3760,7 @@
    }
   ],
   "due_date": "2026-10-01",
-  "amount": 200,
+  "amount": 200.0,
   "references_prior_order": false,
   "confidence": 0.6,
   "needs_clarification": true
@@ -3790,7 +3790,7 @@
   "due_date": "2026-08-25",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3808,7 +3808,7 @@
   "due_date": "2026-09-06",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3837,7 +3837,7 @@
   "due_date": "2026-08-25",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3865,7 +3865,7 @@
   "due_date": "2026-09-13",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3885,7 +3885,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3914,7 +3914,7 @@
   "due_date": "2026-09-15",
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -3932,7 +3932,7 @@
   "due_date": "2026-09-25",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4014,7 +4014,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4033,7 +4033,7 @@
   "due_date": "2026-09-16",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4051,7 +4051,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4085,7 +4085,7 @@
   "due_date": "2026-09-11",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4114,7 +4114,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4205,7 +4205,7 @@
   "due_date": "2026-10-17",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4234,7 +4234,7 @@
   "due_date": "2026-10-13",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4281,7 +4281,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4315,7 +4315,7 @@
   "due_date": "2026-10-04",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4335,7 +4335,7 @@
   "due_date": "2026-10-10",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4413,7 +4413,7 @@
   "due_date": "2026-08-22",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4433,7 +4433,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4452,7 +4452,7 @@
   "due_date": "2026-08-27",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4525,7 +4525,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4581,7 +4581,7 @@
   "due_date": "2026-09-04",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4601,7 +4601,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4630,7 +4630,7 @@
   "due_date": "2026-09-18",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4654,9 +4654,9 @@
    }
   ],
   "due_date": "2026-08-22",
-  "amount": 650,
+  "amount": 650.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4675,7 +4675,7 @@
    }
   ],
   "due_date": null,
-  "amount": 800,
+  "amount": 800.0,
   "references_prior_order": false,
   "confidence": 0.6,
   "needs_clarification": true
@@ -4728,7 +4728,7 @@
   "due_date": "2026-09-17",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4755,9 +4755,9 @@
    }
   ],
   "due_date": "2026-09-23",
-  "amount": 800,
+  "amount": 800.0,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4806,7 +4806,7 @@
    }
   ],
   "due_date": null,
-  "amount": 650,
+  "amount": 650.0,
   "references_prior_order": true,
   "confidence": 0.6,
   "needs_clarification": true
@@ -4848,7 +4848,7 @@
    }
   ],
   "due_date": null,
-  "amount": 500,
+  "amount": 500.0,
   "references_prior_order": false,
   "confidence": 0.5,
   "needs_clarification": true
@@ -4888,7 +4888,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4918,7 +4918,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -4973,7 +4973,7 @@
   "due_date": "2026-09-12",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5007,7 +5007,7 @@
   "due_date": "2026-09-04",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5079,7 +5079,7 @@
    }
   ],
   "due_date": null,
-  "amount": 200,
+  "amount": 200.0,
   "references_prior_order": false,
   "confidence": 0.9,
   "needs_clarification": false
@@ -5128,7 +5128,7 @@
   "due_date": "2026-09-06",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5146,7 +5146,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5182,7 +5182,7 @@
   "due_date": "2026-09-09",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5225,9 +5225,9 @@
    }
   ],
   "due_date": "2026-08-25",
-  "amount": 1200,
+  "amount": 1200.0,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5247,7 +5247,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5267,7 +5267,7 @@
   "due_date": "2026-08-31",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5285,7 +5285,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": true,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5374,7 +5374,7 @@
   "due_date": "2026-09-13",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5395,7 +5395,7 @@
   "due_date": "2026-09-03",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5414,7 +5414,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5491,7 +5491,7 @@
   "due_date": null,
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  },
  {
@@ -5527,7 +5527,7 @@
   "due_date": "2026-10-02",
   "amount": null,
   "references_prior_order": false,
-  "confidence": 1,
+  "confidence": 1.0,
   "needs_clarification": false
  }
 ]

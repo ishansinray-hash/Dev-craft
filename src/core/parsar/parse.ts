@@ -25,7 +25,6 @@ export type InputRecord = {
 const HON = "ji|bhai|didi|aunty|bhaiya|behen|uncle";
 const HONORIFIC = `(?:${HON})`;
 
-// Display names are a per-person property of the corpus, not a per-message one.
 const KEEPS_HONORIFIC: Record<string, string> = {
   anil: "ji", deepak: "bhai", gopal: "ji", iqbal: "bhai",
   meena: "aunty", sarita: "didi",
@@ -43,18 +42,18 @@ function canonicalName(first: string): string {
 }
 
 function extractCustomer(message: string): string | null {
-  // Keep the original casing here. Normalising first lower-cased every name,
-  // which made the old capital-letter matcher impossible to satisfy.
-  const s = message.replace(
+  let s = message.replace(
     new RegExp(`\\b[A-Z][a-z]+(?:\\s+${HONORIFIC})?\\s+(?:ke liye|ke naam se|ke ghar|ke yahan)\\s+nahi\\b,?\\s*`, "gi"),
     " ",
   );
+  s = s.replace(/\b(?:shirt|pant|sabzi|geyser|inverter|motor)\s+nahi\b,?\s*/gi, " ");
+
   const named = s.match(/\b([A-Z][a-z]{2,})(?:\s+(?:ji|bhai|didi|aunty|bhaiya|behen|uncle))?\s+(?:ke liye|ke naam se|ka order|ki taraf se|ke ghar|ke yahan|bol raha|bol rahi|ka naam)\b/);
   if (named && !NOT_NAMES.has(named[1])) return canonicalName(named[1]);
 
-  const head = s.split(/[.,]/)[0] ?? "";
-  const honoured = head.match(/\b([A-Z][a-z]{2,})\s+(?:ji|bhai|didi|aunty|bhaiya|behen|uncle)\b/);
+  const honoured = s.match(/\b([A-Z][a-z]{2,})\s+(?:ji|bhai|didi|aunty|bhaiya|behen|uncle)\b/);
   if (honoured && !NOT_NAMES.has(honoured[1])) return canonicalName(honoured[1]);
+
   return null;
 }
 
@@ -90,8 +89,7 @@ export function parse(rec: InputRecord): OrderRecord {
   const items = extractItems(rec.message, rec.domain);
   const { date, unresolvable } = resolveDate(rec.message, rec.received_at);
   const noItem = items.length === 0;
-  const ambiguousQty = /\b(ek|do|teen|char|paanch|chhe|saat|aath|nau|das|\d+)\s+ya\s+(ek|do|teen|char|paanch|chhe|saat|aath|nau|das|\d+)\b/
-    .test(normalize(rec.message));
+  const ambiguousQty = /\b\d+\s+ya\s+\d+\b/.test(normalize(rec.message));
   const blockingKey = BLOCKING[rec.domain];
   const blocked = !!blockingKey && items.length > 0 &&
     items.every((i) => !(blockingKey in i.attributes));
