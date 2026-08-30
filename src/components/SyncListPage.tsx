@@ -78,6 +78,9 @@ export const SyncListPage: React.FC = () => {
     setSelectedScenario(num);
     setScenarioStatus("Running scenario locally on device...");
     const orderId = "ORD-1042";
+    // Seed the baseline order first, otherwise the scenarios write onto an id
+    // that may not exist and mint an empty ghost order.
+    await clientStore.ensureScenarioOrder(orderId);
 
     if (num === 1) {
       // Scenario 1: Disjoint field edits
@@ -89,15 +92,18 @@ export const SyncListPage: React.FC = () => {
       await clientStore.simulateConflict(orderId);
       setScenarioStatus("⚠️ Scenario 2 Complete: Competing due_date edits submitted. CRDT LWW resolved newest & flagged conflict badge.");
     } else if (num === 3) {
-      // Scenario 3: Item modification vs deletion
-      await clientStore.updateOrderField(orderId, "status", "in_progress");
-      setScenarioStatus("✅ Scenario 3 Complete: Causal order preserved via HLC vector clocks.");
+      // Scenario 3: Causality across a reconnection
+      const { remote, local } = await clientStore.simulateCausalHandoff(orderId);
+      setScenarioStatus(
+        `✅ Scenario 3 Complete: local clock observed remote HLC ${remote.hlc} and issued ${local.hlc} strictly after it, ` +
+        "so the later edit wins despite this device's clock running behind.",
+      );
     }
     await loadData();
   };
 
   const handleResetDb = async () => {
-    if (confirm("Reset local database and seed fresh sample records?")) {
+    if (confirm("Reset the local database? This clears every order and operation on this device.")) {
       await clientStore.resetDatabase();
       await loadData();
     }
@@ -292,7 +298,7 @@ export const SyncListPage: React.FC = () => {
                   </td>
                   <td className="py-2.5 px-3 text-slate-400 text-[11px]">{op.hlc}</td>
                   <td className="py-2.5 px-3 text-right">
-                    {op.server_seq > 0 ? (
+                    {(op.server_seq ?? 0) > 0 ? (
                       <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                         seq: {op.server_seq}
                       </span>

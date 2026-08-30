@@ -22,6 +22,7 @@ import {
   Flame,
 } from "lucide-react";
 import { clientStore } from "../store/clientStore.js";
+import { isActiveStatus } from "../core/sync/types.js";
 import { Snapshot } from "../store/db.js";
 import {
   dueBuckets,
@@ -117,8 +118,10 @@ export const Shopkeeper3DDashboard: React.FC<DashboardProps> = ({
     return orders.reduce((acc, o) => acc + (o.record.paid ?? 0), 0);
   }, [orders]);
 
+  // "In queue" means work still on the bench. Delivered orders are finished, so
+  // excluding only cancelled ones overstated the queue.
   const activeOrdersCount = useMemo(() => {
-    return orders.filter((o) => o.status !== "cancelled").length;
+    return orders.filter((o) => isActiveStatus(o.status)).length;
   }, [orders]);
 
   // Handle Natural Language "Ask the Store" Query

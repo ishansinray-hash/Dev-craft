@@ -69,7 +69,7 @@ export const OrderListPage: React.FC<OrderListPageProps> = () => {
         !term ||
         o.order_id.toLowerCase().includes(term) ||
         (o.customer && o.customer.toLowerCase().includes(term)) ||
-        o.record.items.some((i) => i.description.toLowerCase().includes(term));
+        o.record.items.some((i) => (i.description ?? "").toLowerCase().includes(term));
 
       // Status
       const matchStatus = statusFilter === "all" || o.status === statusFilter;
@@ -423,7 +423,7 @@ export const OrderListPage: React.FC<OrderListPageProps> = () => {
                     <div key={path} className="p-2.5 rounded-lg bg-slate-950 border border-rose-500/20 space-y-1.5">
                       <div className="flex justify-between items-center text-[10px] font-mono text-slate-400">
                         <span>Field: <strong className="text-white">{path}</strong></span>
-                        <span className="text-rose-400">Conflicting HLC: {losingHlc.slice(-12)}</span>
+                        <span className="text-rose-400">Conflicting HLC: {losingHlc.winner.hlc.slice(-12)}</span>
                       </div>
                       <div className="flex items-center gap-2 pt-1">
                         <button

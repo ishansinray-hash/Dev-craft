@@ -152,6 +152,7 @@ class ClientStoreManager {
     const blankState: OrderState = {
       order_id: orderId,
       record: {
+        order_id: orderId,
         status: "open",
         customer: null,
         due_date: null,
@@ -159,7 +160,6 @@ class ClientStoreManager {
         paid: 0,
         references_prior_order: false,
         items: [],
-        tags: [domain],
       },
       versions: {},
       conflicts: {},
@@ -234,7 +234,7 @@ class ClientStoreManager {
   /**
    * Update shopkeeper pricing quote and advance payment
    */
-  async updateOrderPricing(orderId: string, amount: number | null, paid: number | null): Promise<OrderState> {
+  async updateOrderPricing(orderId: string, amount?: number | null, paid?: number | null): Promise<OrderState> {
     const currentState = await this.store.loadState(orderId);
     const ops = [];
     if (amount !== undefined) {
@@ -264,6 +264,55 @@ class ClientStoreManager {
   }
 
   /**
+   * The baseline order the conflict scenarios are written against. The scenario
+   * buttons used to write straight to a hardcoded id, which minted a ghost order
+   * with no customer and no items whenever that id did not exist yet.
+   */
+  async ensureScenarioOrder(orderId: string): Promise<OrderState> {
+    const existing = await this.store.loadState(orderId);
+    if (Object.keys(existing.versions).length > 0) return existing;
+
+    await this.store.commit([
+      this.editor.setField(existing, "customer", "Meena aunty"),
+      this.editor.setField(existing, "due_date", "2026-09-05"),
+      this.editor.setField(existing, "amount", 1200),
+      this.editor.setField(existing, "status", "open"),
+    ]);
+    for (const [description, quantity, attributes] of [
+      ["kurta", 2, { color: "navy blue", chest: 40 }],
+      ["pajama", 1, { color: "cream", waist: 34 }],
+    ] as const) {
+      const state = await this.store.loadState(orderId);
+      await this.store.commit(
+        this.editor.addItem(state, description, quantity, { ...attributes }),
+      );
+    }
+    await this.refreshCounts();
+    return this.store.loadState(orderId);
+  }
+
+  /**
+   * Causality across a reconnection: a remote edit arrives, this device's clock
+   * observes it, and the local edit that follows sorts strictly after it even
+   * though this device's wall clock is behind the remote one's.
+   */
+  async simulateCausalHandoff(orderId: string): Promise<{ remote: Op; local: Op }> {
+    const state = await this.store.loadState(orderId);
+
+    const remoteEditor = new Editor(new Clock("device-tablet-1"));
+    const remote = remoteEditor.setField(state, "amount", 1750, Date.now() + 1500);
+    this.clock.observe(remote.hlc);
+    await this.store.commit([remote]);
+
+    const local = this.editor.setField(await this.store.loadState(orderId), "amount", 1900);
+    await this.store.commit([local]);
+
+    await this.refreshCounts();
+    if (this.isOnline) this.triggerSync().catch(() => {});
+    return { remote, local };
+  }
+
+  /**
    * Simulate a multi-device concurrent conflict test (e.g. Device A sets due date to Sept 8
    * while Device B sets amount to 1500 and modifies due date to Sept 12)
    */
@@ -280,8 +329,14 @@ class ClientStoreManager {
     const opB = editorB.setField(state, "due_date", "2026-09-12", Date.now() + 2000);
     const opB2 = editorB.setField(state, "amount", 1850, Date.now() + 2000);
 
-    // Ingest both ops into store
-    await this.store.commit([opA, opB, opB2]);
+    // These ops come from foreign clocks, so this device must observe them
+    // before it issues another HLC. Skipping this leaves the local clock behind
+    // the ops it just stored, and the operator's next edit to the same field
+    // loses the merge and appears to do nothing.
+    const simulated = [opA, opB, opB2];
+    for (const op of simulated) this.clock.observe(op.hlc);
+
+    await this.store.commit(simulated);
     await this.refreshCounts();
     if (this.isOnline) this.triggerSync().catch(() => {});
     return this.store.loadState(orderId);

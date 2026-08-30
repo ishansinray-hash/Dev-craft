@@ -1,4 +1,4 @@
-import { Op, OrderState, OrderRecordView, ItemRecord, Conflict, HLC } from "./types.js";
+import { Op, OrderState, OrderRecordView, ItemRecord, Conflict, HLC, isOrderStatus } from "./types.js";
 import { compare } from "./hlc.js";
 
 // The replicated state IS the set of ops. Everything else is a view.
@@ -9,7 +9,10 @@ import { compare } from "./hlc.js";
 // is unobservable by construction — that is the whole convergence proof, and
 // it is what Test C checks by reconnecting in both directions.
 
-const FIELD_KEYS = ["customer", "due_date", "amount", "paid", "status", "references_prior_order"] as const;
+const FIELD_KEYS = [
+  "customer", "due_date", "amount", "paid", "status", "references_prior_order",
+  "raw_message", "customer_proposed_price", "domain", "confidence",
+] as const;
 
 function emptyRecord(orderId: string): OrderRecordView {
   return {
@@ -76,10 +79,15 @@ export function materialize(ops: Op[], orderId?: string): OrderState {
       if (key === "references_prior_order") record.references_prior_order = !!winner.value;
       else if (key === "amount") record.amount = winner.value as number | null;
       else if (key === "paid") record.paid = typeof winner.value === "number" ? winner.value : 0;
-      else if (key === "status" && (winner.value === "open" || winner.value === "cancelled"))
-        record.status = winner.value;
+      // Validated against the lifecycle rather than a hand-written pair, so a
+      // status added to the contract cannot be dropped here by omission.
+      else if (key === "status" && isOrderStatus(winner.value)) record.status = winner.value;
       else if (key === "customer") record.customer = winner.value as string | null;
       else if (key === "due_date") record.due_date = winner.value as string | null;
+      else if (key === "raw_message") record.raw_message = winner.value as string;
+      else if (key === "customer_proposed_price") record.customer_proposed_price = winner.value as number | null;
+      else if (key === "domain") record.domain = winner.value as string;
+      else if (key === "confidence") record.confidence = winner.value as number;
       continue;
     }
 

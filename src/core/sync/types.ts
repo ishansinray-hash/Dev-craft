@@ -37,7 +37,26 @@ export const HLC_COUNTER_WIDTH = 5;
 
 export type OpValue = string | number | boolean | null;
 
-export type OrderStatus = "open" | "cancelled";
+/**
+ * The order lifecycle the operator drives. "open" through "ready" is work still
+ * on the bench; "delivered" and "cancelled" are terminal. Every one of these is
+ * written by the UI, so every one must survive the merge — a status the
+ * materialiser does not know about is an edit silently thrown away.
+ */
+export const ORDER_STATUSES = ["open", "in_progress", "ready", "delivered", "cancelled"] as const;
+
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+/** Statuses that still represent committed work, for scheduling and capacity. */
+export const ACTIVE_STATUSES = ["open", "in_progress", "ready"] as const;
+
+export function isOrderStatus(value: unknown): value is OrderStatus {
+  return typeof value === "string" && (ORDER_STATUSES as readonly string[]).includes(value);
+}
+
+export function isActiveStatus(value: unknown): boolean {
+  return typeof value === "string" && (ACTIVE_STATUSES as readonly string[]).includes(value);
+}
 
 /** One mutation of one path. The unit of replication. */
 export type Op = {
@@ -75,6 +94,13 @@ export type OrderRecordView = {
   paid: number;
   status: OrderStatus;
   references_prior_order: boolean;
+  /** Original customer wording, retained locally as an audit note. */
+  raw_message?: string;
+  /** A customer may suggest a price; it is never the shopkeeper's quote. */
+  customer_proposed_price?: number | null;
+  /** Domain and parser metadata used by the local UI. */
+  domain?: string;
+  confidence?: number;
   items: ItemRecord[];
 };
 

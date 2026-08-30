@@ -1,7 +1,9 @@
 import { normalize } from "./normalize.js";
 import { resolveDate } from "./dates.js";
 import { extractItems, type Item } from "./extract.js";
-import { PRIOR_ORDER, BLOCKING, type Domain } from "./vocab.js";
+import { BLOCKING, type Domain } from "./vocab.js";
+
+export type { Domain } from "./vocab.js";
 
 export type OrderRecord = {
   customer: string | null;
@@ -40,26 +42,19 @@ function canonicalName(first: string): string {
   return want ? `${first} ${want}` : first;
 }
 
-function dropNegatedNames(s: string): string {
-  return s.replace(
-    new RegExp(`\\b[A-Z][a-z]+(?:\\s+${HONORIFIC})?\\s+(?:ke liye|ke naam se|ke ghar|ke yahan)\\s+nahi\\b,?`, "g"),
+function extractCustomer(message: string): string | null {
+  // Keep the original casing here. Normalising first lower-cased every name,
+  // which made the old capital-letter matcher impossible to satisfy.
+  const s = message.replace(
+    new RegExp(`\\b[A-Z][a-z]+(?:\\s+${HONORIFIC})?\\s+(?:ke liye|ke naam se|ke ghar|ke yahan)\\s+nahi\\b,?\\s*`, "gi"),
     " ",
   );
-}
-
-function extractCustomer(message: string): string | null {
-  const s = dropNegatedNames(normalize(message, true));
-  const NAME = `([A-Z][a-z]{2,})(?:\\s+(${HON}))?`;
-  let m = s.match(new RegExp(
-    `\\b${NAME}\\s+(?:ke liye|ke naam se|ka order|ki taraf se|ke ghar|ke yahan|bol raha|bol rahi|ka naam)\\b`));
-  if (m && !NOT_NAMES.has(m[1])) return canonicalName(m[1]);
-
-  m = s.match(new RegExp(`\\b([A-Z][a-z]{2,})\\s+(${HON})\\b`));
-  if (m && !NOT_NAMES.has(m[1])) return canonicalName(m[1]);
+  const named = s.match(/\b([A-Z][a-z]{2,})(?:\s+(?:ji|bhai|didi|aunty|bhaiya|behen|uncle))?\s+(?:ke liye|ke naam se|ka order|ki taraf se|ke ghar|ke yahan|bol raha|bol rahi|ka naam)\b/);
+  if (named && !NOT_NAMES.has(named[1])) return canonicalName(named[1]);
 
   const head = s.split(/[.,]/)[0] ?? "";
-  m = head.match(/\b([A-Z][a-z]{2,})\b/);
-  if (m && !NOT_NAMES.has(m[1]) && head.indexOf(m[1]) > 0) return canonicalName(m[1]);
+  const honoured = head.match(/\b([A-Z][a-z]{2,})\s+(?:ji|bhai|didi|aunty|bhaiya|behen|uncle)\b/);
+  if (honoured && !NOT_NAMES.has(honoured[1])) return canonicalName(honoured[1]);
   return null;
 }
 
@@ -78,15 +73,17 @@ function extractAmount(message: string): number | null {
     if (value < 100) continue;
     best = value;
   }
+  if (best === null) {
+    const standalone = [...s.matchAll(/(?:^|[,;])\s*(\d{3,5})(?=\s*(?:$|[,.;]))/g)].at(-1);
+    if (standalone) best = Number(standalone[1]);
+  }
   return best;
 }
 
 function referencesPrior(message: string): boolean {
   const s = normalize(message);
-  const m = s.match(PRIOR_ORDER);
-  if (!m) return false;
-  const tail = s.slice(m.index! + m[0].length, m.index! + m[0].length + 10);
-  return !/^\s*nahi\b/.test(tail);
+  if (/\b(?:pichli baar|pichla order|last time|last wale|pehle jaisa)\s+(?:jaisa\s+)?nahi\b/.test(s)) return false;
+  return /\b(?:pichli baar|pichla order|last time|last wale|pehle jaisa)\b/.test(s);
 }
 
 export function parse(rec: InputRecord): OrderRecord {

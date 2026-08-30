@@ -1,5 +1,5 @@
 import { Store, Snapshot } from "./db.js";
-import { OrderRecordView } from "../core/sync/types.js";
+import { OrderRecordView, ACTIVE_STATUSES, isActiveStatus } from "../core/sync/types.js";
 
 // Objective 4. The four questions the operator must be able to answer without
 // scrolling, all served from the indexed snapshot table so nothing re-folds the
@@ -22,7 +22,9 @@ export type DueBuckets = {
 
 /** "What is due today, and what is overdue?" */
 export async function dueBuckets(store: Store, today: string): Promise<DueBuckets> {
-  const open = await store.snapshots.where("status").equals("open").toArray();
+  // Work still on the bench: anything not delivered and not cancelled. Filtering
+  // on "open" alone hid every order the operator had already started.
+  const open = await store.snapshots.where("status").anyOf([...ACTIVE_STATUSES]).toArray();
   const t = dayOf(today);
   const out: DueBuckets = { overdue: [], today: [], upcoming: [], undated: [] };
   for (const o of open) {
@@ -85,7 +87,7 @@ export async function capacity(
   const rows = await store.snapshots
     .where("due_date").between(window[0], window[days - 1], true, true).toArray();
   for (const o of rows) {
-    if (o.status !== "open") continue;
+    if (!isActiveStatus(o.status)) continue;
     const bucket = index.get(o.due_date!);
     if (!bucket) continue;
     bucket.orders += 1;

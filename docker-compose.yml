@@ -5,7 +5,8 @@ services:
       - "8080:8080"
     environment:
       DB_PATH: /data/relay.db
-      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-"aw8jivZMW5rV15InjS8Nn3n2NrHnvJmc"}
+      # Supplied by the operator's environment or .env file. Never commit a key.
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
       MISTRAL_MODEL: ${MISTRAL_MODEL:-mistral-small-latest}
     volumes:
       - relay-data:/data
