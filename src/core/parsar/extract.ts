@@ -107,12 +107,14 @@ function setMeasurement(attributes: Item["attributes"], text: string, key: "ches
 function attributesFor(text: string, domain: Domain): Item["attributes"] {
   const attributes: Item["attributes"] = {};
 
-  // Shared palette first, so a colour no domain list carries (orange, charcoal,
-  // firozi) still lands. The domain blocks below run afterwards and overwrite
-  // it, which keeps their more precise reading — "navy blue" over "blue".
-  // Matched on word boundaries: a substring test made "lal" fire inside
-  // "khali" and "tan" inside "tantra".
-  for (const [name, value] of Object.entries(COLOR_PATTERNS)) {
+  // Shared palette first, so a colour the tailor list does not carry (orange,
+  // charcoal, firozi) still lands. The tailor block below runs afterwards and
+  // overwrites it, keeping the more precise reading — "navy blue" over "blue".
+  //
+  // Garments only. In a bakery order "red velvet" and "black forest" are
+  // flavours, and reading a colour out of them contradicts the labelled data;
+  // no domain but tailor carries a colour attribute.
+  if (domain === "tailor") for (const [name, value] of Object.entries(COLOR_PATTERNS)) {
     if (new RegExp(`\\b${name}\\b`).test(text)) { attributes.color = value; break; }
   }
 
