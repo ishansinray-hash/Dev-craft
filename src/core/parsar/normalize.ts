@@ -22,6 +22,9 @@ export function normalize(text: string): string {
     ["ब्रेड", "bread loaf"], ["ब्राउनी", "brownie"], ["डोनट", "donut"],
     ["केक", "cake"], ["कुकी", "cookies"], ["पंखा", "ceiling fan"],
     ["घंटी", "doorbell"], ["वायरिंग", "wiring"],
+    ["लाल", "red"], ["नीला", "blue"], ["नीले", "blue"], ["पीला", "yellow"], ["पीले", "yellow"],
+    ["हरा", "green"], ["हरे", "green"], ["काला", "black"], ["काले", "black"],
+    ["सफेद", "white"], ["गुलाबी", "pink"], ["बैंगनी", "purple"], ["भूरा", "brown"],
   ];
   for (const [from, to] of phrases) s = s.replaceAll(from, to);
 

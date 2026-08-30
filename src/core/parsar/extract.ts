@@ -54,9 +54,13 @@ export function extractAttributes(segment: string, domain: Domain, currentItem =
       }
     }
 
-    for (const col of ["bottle green", "navy blue", "maroon", "mustard", "pink", "beige", "grey", "white", "orange", "cyan", "charcoal"]) {
+    for (const col of [
+      "bottle green", "navy blue", "sky blue", "dark blue", "light blue", "dark green", "light green", "royal blue",
+      "blue", "yellow", "red", "green", "black", "white", "pink", "purple", "orange", "brown", "grey", "gray",
+      "maroon", "mustard", "beige", "cyan", "charcoal", "gold", "silver", "peach", "cream"
+    ]) {
       if (new RegExp(`\\b${col}\\b`).test(s)) {
-        attrs["color"] = col;
+        attrs["color"] = col === "gray" ? "grey" : col;
         break;
       }
     }
